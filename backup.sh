@@ -6,14 +6,25 @@ function backup_host() {
     local ssh_config
     local hostip
     local target_dir
+    local previous_backup_dir
 
     ssh_config="$1"
     hostip="$2"
     target_dir="$3"
+    previous_backup_dir="$4"
+
+    local link_dest_param
 
     mkdir -p "$target_dir"
+
+    if [ -z "$previous_backup_dir" ]; then
+        link_dest_param=""
+    else
+        link_dest_param="--link-dest=$previous_backup_dir"
+    fi
+
     rsync -e "ssh -F $ssh_config" --rsync-path="sudo rsync" \
-      -v -r -H -l -g -o -t -D -p --del \
+      -v -r -H -l -g -o -t -D -p --del $link_dest_param \
       --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found} \
       $hostip:/ "$target_dir"
 }
@@ -81,14 +92,25 @@ function backup_hosts() {
     local ssh_config
     local hosts
     local target_dir
+    local previous_backup_dir
 
     ssh_config="$1"
     hosts="$2"
     target_dir="$3"
+    previous_backup_dir="$4"
+
+    local previous_backup_param
+
 
     for host in $hosts;
     do
-        backup_host "$ssh_config" "$host" "$target_dir/$host"
+        if [ -z "$previous_backup_dir" ]; then
+            previous_backup_param=""
+        else
+            previous_backup_param="$previous_backup_dir/$host"
+        fi
+        backup_host \
+          "$ssh_config" "$host" "$target_dir/$host" "$previous_backup_param"
     done
 }
 
@@ -102,6 +124,7 @@ function backup_hosts_through_tunnel() {
 
     local hosts
     local target_dir
+    local previous_backup_dir
 
     ssh_gateway="$1"
     identity_file="$2"
@@ -111,6 +134,7 @@ function backup_hosts_through_tunnel() {
     ssh_config="$6"
     hosts="$7"
     target_dir="$8"
+    previous_backup_dir="$9"
 
     generate_tunneling_ssh_config \
         "$ssh_gateway" "$identity_file" "$hosts_file" \
@@ -118,7 +142,7 @@ function backup_hosts_through_tunnel() {
 
     tunnel_create "$ssh_config"
 
-    backup_hosts "$ssh_config" "$hosts" "$target_dir"
+    backup_hosts "$ssh_config" "$hosts" "$target_dir" "$previous_backup_dir"
 
     tunnel_delete
 }
