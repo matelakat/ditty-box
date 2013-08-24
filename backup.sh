@@ -25,7 +25,7 @@ function backup_host() {
 
     rsync -e "ssh -F $ssh_config" --rsync-path="sudo rsync" \
       -v -r -H -l -g -o -t -D -p --del $link_dest_param \
-      --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found} \
+      --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/home/*/.gvfs} \
       $hostip:/ "$target_dir"
 }
 
