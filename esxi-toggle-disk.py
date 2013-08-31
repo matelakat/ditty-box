@@ -121,7 +121,11 @@ def main(args):
 
     if get_disk_path(guest_disk) in [get_disk_path(d) for d in controller_disks]:
         detach_disk(get_disk_path(guest_disk), controller, server)
+        if args.power:
+            guest.power_on()
     else:
+        if args.power:
+            guest.power_off()
         attach_disk(guest_disk, controller, server)
 
     server.disconnect()
@@ -133,5 +137,7 @@ if __name__ == "__main__":
     parser.add_argument('password', help='Password for root')
     parser.add_argument('guest', help='Name of guest VM')
     parser.add_argument('controller', help='Name of controller VM')
+    parser.add_argument('--power', help='Power on/off the VM',
+                        action='store_true', default=False)
     args = parser.parse_args()
     main(args)
