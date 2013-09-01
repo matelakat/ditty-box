@@ -125,7 +125,8 @@ def main(args):
             guest.power_on()
     else:
         if args.power:
-            guest.power_off()
+            if guest.get_status() != 'POWERED OFF':
+                guest.power_off()
         attach_disk(guest_disk, controller, server)
 
     server.disconnect()
