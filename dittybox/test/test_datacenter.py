@@ -20,7 +20,7 @@ class VMListTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
         server = hypervisor.get_server('user', 'pass')
-        server.add_vm('some_vm')
+        server.test_methods.add_vm('some_vm')
 
         dc = datacenter.Datacenter(server)
 
@@ -31,7 +31,7 @@ class VMListTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
         server = hypervisor.get_server('user', 'pass')
-        server.add_vm('some_vm').power_on()
+        server.test_methods.add_vm('some_vm').power_on()
 
         dc = datacenter.Datacenter(server)
 
