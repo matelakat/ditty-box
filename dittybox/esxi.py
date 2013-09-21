@@ -8,14 +8,8 @@ class ESXiDisk(hypervisor.Disk):
     def __init__(self, esxi_disk):
         self.esxi_disk = esxi_disk
 
-    def __eq__(self, other):
-        return (
-            isinstance(other, self.__class__)
-            and self.esxi_filename == other.esxi_filename
-        )
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    def the_same_disk_as(self, other_disk):
+        return self.esxi_filename == other_disk.esxi_filename
 
     @property
     def esxi_filename(self):

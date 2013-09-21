@@ -55,6 +55,19 @@ class VM(object):
 class Disk(object):
     __metaclass__ = abc.ABCMeta
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__)
+            and self.the_same_disk_as(other)
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    @abc.abstractmethod
+    def the_same_disk_as(self, other_disk):
+        pass
+
 
 def get_server(host, password):
     return _IMPL.get_server(host, password)
