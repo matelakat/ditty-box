@@ -5,6 +5,7 @@ import importlib
 
 from dittybox import config
 from dittybox import hypervisor
+from dittybox import datacenter
 
 
 class DatacenterCommands(cmd.Cmd):
@@ -12,9 +13,8 @@ class DatacenterCommands(cmd.Cmd):
         return True
 
     def do_vm_list(self, arg):
-        for vm in self.hypervisor.vms:
-            status = ' OFF' if vm.powered_off else ''
-            print "%s%s" % (vm.name, status)
+        for vm_name, pwr in self.dc.list_vms():
+            print vm_name, pwr
 
     def do_vm_install(self, arg):
         pass
@@ -34,8 +34,9 @@ def main():
     hypervisor_driver = importlib.import_module(cfg.hypervisor.driver)
     hypervisor.set_hypervisor(hypervisor_driver)
 
-    cmd_.hypervisor = hypervisor.get_server(
-        cfg.hypervisor.ip, cfg.hypervisor.password)
+    hv = hypervisor.get_server(cfg.hypervisor.ip, cfg.hypervisor.password)
+
+    cmd_.dc = datacenter.Datacenter(hv)
     cmd_.cmdloop()
-    cmd_.hypervisor.disconnect()
+    hv.disconnect()
 
