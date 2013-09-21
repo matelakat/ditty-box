@@ -3,7 +3,7 @@ from pysphere import VIServer
 from dittybox import hypervisor
 
 
-class ESXiServer(object):
+class ESXiServer(hypervisor.Server):
     def __init__(self, viserver):
         self.viserver = viserver
 

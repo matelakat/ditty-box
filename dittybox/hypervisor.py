@@ -1,4 +1,18 @@
+import abc
+
 _IMPL = None
+
+
+class Server(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractproperty
+    def vms(self):
+        pass
+
+    @abc.abstractmethod
+    def disconnect(self):
+        pass
 
 
 class VM(object):
