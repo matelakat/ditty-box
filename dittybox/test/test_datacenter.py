@@ -6,34 +6,27 @@ from dittybox import hypervisor
 
 
 class VMListTest(unittest.TestCase):
-    def test_server_listing(self):
+    def setUp(self):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
-        server = hypervisor.get_server('user', 'pass')
+        self.server = hypervisor.get_server('user', 'pass')
+        self.dc = datacenter.Datacenter(self.server)
 
-        dc = datacenter.Datacenter(server)
+    def test_server_listing(self):
+        vms = self.dc.list_vms()
 
-        vms = dc.list_vms()
         self.assertEquals([], vms)
 
     def test_server_listing_includes_power_state(self):
-        hv = fake_hypervisor.FakeHypervisor()
-        hypervisor.set_hypervisor(hv)
-        server = hypervisor.get_server('user', 'pass')
-        server.test_methods.add_vm('some_vm')
+        self.server.test_methods.add_vm('some_vm')
 
-        dc = datacenter.Datacenter(server)
+        vms = self.dc.list_vms()
 
-        vms = dc.list_vms()
         self.assertEquals([('some_vm', 'OFF')], vms)
 
     def test_server_listing_includes_power_state(self):
-        hv = fake_hypervisor.FakeHypervisor()
-        hypervisor.set_hypervisor(hv)
-        server = hypervisor.get_server('user', 'pass')
-        server.test_methods.add_vm('some_vm').power_on()
+        self.server.test_methods.add_vm('some_vm').power_on()
 
-        dc = datacenter.Datacenter(server)
+        vms = self.dc.list_vms()
 
-        vms = dc.list_vms()
         self.assertEquals([('some_vm', 'NOT OFF')], vms)
