@@ -18,7 +18,7 @@ def main(args):
     server.disconnect()
 
 
-if __name__ == "__main__":
+def list_vms():
     parser = argparse.ArgumentParser(description='List virtual machines')
     parser.add_argument('host', help='ESXi host')
     parser.add_argument('password', help='Password for root')

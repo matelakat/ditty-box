@@ -3,6 +3,17 @@ ditty-box
 
 Some fabric tasks and other utilities
 
+## Install
+
+    python setup.py install
+
+## Scripts
+
+### ESXi related
+List your VMs:
+
+    esxi-list-vms --help
+
 ## ESXi disk toggler
 
 If you have a controller vm, you can attach-detach the guest VM's only disk to

@@ -8,6 +8,8 @@ setup(
     packages=['dittybox'],
     install_requires=['fabric', 'pysphere'],
     entry_points = {
-        'console_scripts': []
+        'console_scripts': [
+            'esxi-list-vms = dittybox.scripts.esxi:list_vms'
+        ]
     }
 )
