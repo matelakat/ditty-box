@@ -30,3 +30,44 @@ class VMListTest(unittest.TestCase):
         vms = self.dc.list_vms()
 
         self.assertEquals([('some_vm', 'NOT OFF')], vms)
+
+
+class VMInstallValidationTest(unittest.TestCase):
+    def setUp(self):
+        hv = fake_hypervisor.FakeHypervisor()
+        hypervisor.set_hypervisor(hv)
+        self.server = hypervisor.get_server('user', 'pass')
+        self.dc = datacenter.Datacenter(self.server)
+
+    def test_no_vm_found(self):
+        result = self.dc.install_vm('vm1')
+
+        self.assertTrue(result.failed)
+        self.assertEquals("no such vm", result.data)
+
+    def test_vm_found_but_no_controller_found(self):
+        self.server.test_methods.add_vm('vm1')
+        self.dc.controller = datacenter.Controller('controller')
+
+        result = self.dc.install_vm('vm1')
+
+        self.assertTrue(result.failed)
+        self.assertEquals("controller vm not found", result.data)
+
+    def test_install_controller_fails(self):
+        self.server.test_methods.add_vm('controller')
+        self.dc.controller = datacenter.Controller('controller')
+
+        result = self.dc.install_vm('controller')
+
+        self.assertTrue(result.failed)
+        self.assertEquals('cannot install controller', result.data)
+
+    def test_vm_and_controller_found(self):
+        self.server.test_methods.add_vm('vm1')
+        self.server.test_methods.add_vm('controller')
+        self.dc.controller = datacenter.Controller('controller')
+
+        result = self.dc.install_vm('vm1')
+
+        self.assertFalse(result.failed)
