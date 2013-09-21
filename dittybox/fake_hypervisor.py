@@ -30,7 +30,7 @@ class FakeVM(hypervisor.VM):
         return self._powered_off
 
 
-class ServerTestMethods(object):
+class FakeServerMethods(object):
     def __init__(self):
         self.vms = []
 
@@ -43,11 +43,11 @@ class ServerTestMethods(object):
 class FakeServer(hypervisor.Server):
 
     def __init__(self):
-        self.test_methods = ServerTestMethods()
+        self.fake = FakeServerMethods()
 
     @property
     def vms(self):
-        return self.test_methods.vms
+        return self.fake.vms
 
     def attach_disk(self, disk, vm):
         raise NotImplementedError()

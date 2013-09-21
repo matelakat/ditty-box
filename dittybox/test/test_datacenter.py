@@ -18,14 +18,14 @@ class VMListTest(unittest.TestCase):
         self.assertEquals([], vms)
 
     def test_server_listing_includes_power_state(self):
-        self.server.test_methods.add_vm('some_vm')
+        self.server.fake.add_vm('some_vm')
 
         vms = self.dc.list_vms()
 
         self.assertEquals([('some_vm', 'OFF')], vms)
 
     def test_server_listing_includes_power_state(self):
-        self.server.test_methods.add_vm('some_vm').power_on()
+        self.server.fake.add_vm('some_vm').power_on()
 
         vms = self.dc.list_vms()
 
@@ -46,7 +46,7 @@ class VMInstallValidationTest(unittest.TestCase):
         self.assertEquals("no such vm", result.data)
 
     def test_vm_found_but_no_controller_found(self):
-        self.server.test_methods.add_vm('vm1')
+        self.server.fake.add_vm('vm1')
         self.dc.controller = datacenter.Controller('controller')
 
         result = self.dc.install_vm('vm1')
@@ -55,7 +55,7 @@ class VMInstallValidationTest(unittest.TestCase):
         self.assertEquals("controller vm not found", result.data)
 
     def test_install_controller_fails(self):
-        self.server.test_methods.add_vm('controller')
+        self.server.fake.add_vm('controller')
         self.dc.controller = datacenter.Controller('controller')
 
         result = self.dc.install_vm('controller')
@@ -64,8 +64,8 @@ class VMInstallValidationTest(unittest.TestCase):
         self.assertEquals('cannot install controller', result.data)
 
     def test_vm_and_controller_found(self):
-        self.server.test_methods.add_vm('vm1')
-        self.server.test_methods.add_vm('controller')
+        self.server.fake.add_vm('vm1')
+        self.server.fake.add_vm('controller')
         self.dc.controller = datacenter.Controller('controller')
 
         result = self.dc.install_vm('vm1')
