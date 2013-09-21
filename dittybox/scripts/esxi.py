@@ -1,11 +1,6 @@
 import argparse
-from pysphere import VIServer
 
-
-def get_server(host, password):
-    server = VIServer()
-    server.connect(host, "root", password)
-    return server
+from dittybox import hypervisor
 
 
 def get_args_for_list_vms():
@@ -17,7 +12,10 @@ def get_args_for_list_vms():
 
 def list_vms():
     args = get_args_for_list_vms()
-    server = get_server(args.host, args.password)
+    from dittybox import esxi
+    hypervisor.set_hypervisor(esxi)
+
+    server = hypervisor.get_server(args.host, args.password)
 
     for vmpath in server.get_registered_vms():
         vm = server.get_vm_by_path(vmpath)
