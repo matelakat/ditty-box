@@ -17,11 +17,7 @@ def list_vms():
 
     server = hypervisor.get_server(args.host, args.password)
 
-    props = server._retrieve_properties_traversal(
-        property_names=['config.name', 'runtime.powerState'],
-        obj_type="VirtualMachine")
-
-    for prop_set in props:
-        print ' '.join(prop.Val for prop in prop_set.PropSet)
+    for vm in server.vms:
+        print vm.name, vm.power_state
 
     server.disconnect()
