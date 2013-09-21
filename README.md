@@ -1,31 +1,24 @@
 ditty-box
 =========
 
-Some fabric tasks and other utilities
+Useful utilities for system administration
 
 ## Install
 
     python setup.py install
 
-## Scripts
+## ESXi Scripts
 
-### ESXi related
-List your VMs:
+ - List vms: `esxi-list-vms`
+ - Toggle disk: `esxi-toggle-disk`
 
-    esxi-list-vms --help
+## Other
 
-## ESXi disk toggler
-
-If you have a controller vm, you can attach-detach the guest VM's only disk to
-it with:
-
-    python esxi-toggle-disk.py <ESXI HOST> <PASSWORD> <GUEST VM> <CONTROLER VM>
-
-Unplug:
+Unplug disk from ESXi guest:
 
     echo "1" > /sys/block/sdb/device/delete
 
-Plug:
+Plug to ESXi guest:
 
     echo "- - -" > /sys/class/scsi_host/host2/scan
 
