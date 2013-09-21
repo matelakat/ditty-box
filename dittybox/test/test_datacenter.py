@@ -111,8 +111,13 @@ class VMInstallTest(unittest.TestCase):
 
         self.assertFalse(result.failed)
 
-        self.assertTrue(self.vm.powered_off)
-        self.assertFalse(self.controller_vm.powered_off)
+        self.assertEquals([
+                (self.server.attach_disk, self.guest_disk, self.controller_vm),
+                self.dc.controller.plug_disk,
+                self.dc.controller.debootstrap_to_disk,
+                self.dc.controller.unplug_disk,
+                (self.server.detach_disk, self.guest_disk, self.controller_vm),
+            ], self.fake_calls)
 
     def test_vms_power_state_guest_initially_on(self):
         self.vm.power_on()
@@ -121,10 +126,8 @@ class VMInstallTest(unittest.TestCase):
 
         self.assertFalse(result.failed)
 
-        self.assertTrue(self.vm.powered_off)
-        self.assertFalse(self.controller_vm.powered_off)
-
         self.assertEquals([
+                self.vm.power_off,
                 (self.server.attach_disk, self.guest_disk, self.controller_vm),
                 self.dc.controller.plug_disk,
                 self.dc.controller.debootstrap_to_disk,
