@@ -74,8 +74,11 @@ class Datacenter(object):
         if vm_to_install == vm_controller:
             return Fail('cannot install controller')
 
+    def _install_vm(self, vm_name):
+        return Success(None)
+
     def install_vm(self, vm_name):
         validation_error = self._validate_install_vm(vm_name)
         if validation_error:
             return validation_error
-        return Success(None)
+        return self._install_vm(vm_name)
