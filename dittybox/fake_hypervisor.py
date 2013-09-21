@@ -3,14 +3,32 @@ import mock
 from dittybox import hypervisor
 
 
+class FakeDisk(hypervisor.Disk):
+    def __init__(self, fake_name):
+        self.fake_name = fake_name
+
+    def the_same_disk_as(self, other_disk):
+        return self.fake_name == other_disk.fake_name
+
+
+class FakeVMMethods(object):
+    def __init__(self):
+        self.disks = []
+
+    def add_disks(self, *disk_names):
+        for disk_name in disk_names:
+            self.disks.append(FakeDisk(disk_name))
+
+
 class FakeVM(hypervisor.VM):
     def __init__(self, name):
         self._name = name
         self._powered_off = True
+        self.fake = FakeVMMethods()
 
     @property
     def disks(self):
-        raise NotImplementedError()
+        return self.fake.disks
 
     @property
     def name(self):

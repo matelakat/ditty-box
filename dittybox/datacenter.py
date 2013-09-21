@@ -74,6 +74,9 @@ class Datacenter(object):
         if vm_to_install == vm_controller:
             return Fail('cannot install controller')
 
+        if len(vm_controller.disks) != 1:
+            return Fail('controller already has a second disk attached')
+
     def _install_vm(self, vm_name):
         raise NotImplementedError()
 

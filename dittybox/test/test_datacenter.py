@@ -66,9 +66,20 @@ class VMInstallValidationTest(unittest.TestCase):
         self.assertTrue(result.failed)
         self.assertEquals('cannot install controller', result.data)
 
+    def test_controller_is_busy(self):
+        self.server.fake.add_vm('vm1')
+        self.server.fake.add_vm('controller').fake.add_disks('disk1', 'disk2')
+        self.dc.controller = datacenter.Controller('controller')
+
+        result = self.dc.install_vm('vm1')
+
+        self.assertTrue(result.failed)
+        self.assertEquals(
+            'controller already has a second disk attached', result.data)
+
     def test_valid(self):
         self.server.fake.add_vm('vm1')
-        self.server.fake.add_vm('controller')
+        self.server.fake.add_vm('controller').fake.add_disks('disk1')
         self.dc.controller = datacenter.Controller('controller')
 
         result = self.dc.install_vm('vm1')
