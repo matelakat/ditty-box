@@ -2,8 +2,44 @@ import abc
 
 
 class Controller(object):
-    def __init__(self, vm_name):
-        self.vm_name = vm_name
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def unplug_disk(self):
+        pass
+
+    @abc.abstractmethod
+    def plug_disk(self):
+        pass
+
+    @abc.abstractmethod
+    def debootstrap_to_disk(self):
+        pass
+
+    @abc.abstractproperty
+    def vm_name(self):
+        pass
+
+
+class FakeController(Controller):
+    def __init__(self, vm_name, fake_call_collector=None):
+        self._vm_name = vm_name
+        if fake_call_collector is None:
+            fake_call_collector = []
+        self.fake_call_collector = fake_call_collector
+
+    @property
+    def vm_name(self):
+        return self._vm_name
+
+    def plug_disk(self):
+        self.fake_call_collector.append(self.plug_disk)
+
+    def unplug_disk(self):
+        self.fake_call_collector.append(self.unplug_disk)
+
+    def debootstrap_to_disk(self):
+        self.fake_call_collector.append(self.debootstrap_to_disk)
 
 
 class Result(object):
@@ -77,11 +113,24 @@ class Datacenter(object):
         if len(vm_controller.disks) != 1:
             return Fail('controller already has a second disk attached')
 
-    def _install_vm(self, vm_name):
-        raise NotImplementedError()
+        guest_disk, = vm_to_install.disks
+
+        return Success((vm_controller, vm_to_install, guest_disk))
+
+    def _install_vm(self, vm_controller, vm_to_install, guest_disk):
+        if not vm_to_install.powered_off:
+            vm_to_install.power_off()
+
+        self.hypervisor.attach_disk(guest_disk, vm_controller)
+        self.controller.plug_disk()
+        self.controller.debootstrap_to_disk()
+        self.controller.unplug_disk()
+        self.hypervisor.detach_disk(guest_disk, vm_controller)
+
+        return Success(None)
 
     def install_vm(self, vm_name):
-        validation_error = self._validate_install_vm(vm_name)
-        if validation_error:
-            return validation_error
-        return self._install_vm(vm_name)
+        validation_result = self._validate_install_vm(vm_name)
+        if validation_result.failed:
+            return validation_result
+        return self._install_vm(*validation_result.data)

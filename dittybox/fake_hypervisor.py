@@ -16,8 +16,12 @@ class FakeVMMethods(object):
         self.disks = []
 
     def add_disks(self, *disk_names):
+        result = []
         for disk_name in disk_names:
-            self.disks.append(FakeDisk(disk_name))
+            disk = FakeDisk(disk_name)
+            self.disks.append(disk)
+            result.append(disk)
+        return result
 
 
 class FakeVM(hypervisor.VM):
@@ -35,7 +39,10 @@ class FakeVM(hypervisor.VM):
         return self._name
 
     def power_off(self):
-        raise NotImplementedError()
+        if self.powered_off:
+            raise AssertionError("Attempt to power off a stopped vm")
+        self._powered_off = True
+
 
     def power_on(self):
         if self.powered_off:
@@ -60,7 +67,10 @@ class FakeServerMethods(object):
 
 class FakeServer(hypervisor.Server):
 
-    def __init__(self):
+    def __init__(self, fake_call_collector=None):
+        if fake_call_collector is None:
+            fake_call_collector = []
+        self.fake_call_collector = fake_call_collector
         self.fake = FakeServerMethods()
 
     @property
@@ -68,15 +78,20 @@ class FakeServer(hypervisor.Server):
         return self.fake.vms
 
     def attach_disk(self, disk, vm):
-        raise NotImplementedError()
+        self.fake_call_collector.append((self.attach_disk, disk, vm))
 
     def detach_disk(self, disk, vm):
-        raise NotImplementedError()
+        self.fake_call_collector.append((self.detach_disk, disk, vm))
 
     def disconnect(self):
         raise NotImplementedError()
 
 
 class FakeHypervisor(object):
+    def __init__(self, fake_call_collector=None):
+        if fake_call_collector is None:
+            fake_call_collector = []
+        self.fake_call_collector = fake_call_collector
+
     def get_server(self, username, password):
-        return FakeServer()
+        return FakeServer(self.fake_call_collector)
