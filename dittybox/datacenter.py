@@ -55,7 +55,7 @@ class Datacenter(object):
             result.append((vm.name, 'OFF' if vm.powered_off else 'NOT OFF'))
         return result
 
-    def install_vm(self, vm_name):
+    def _validate_install_vm(self, vm_name):
         vm_to_install = None
         vm_controller = None
 
@@ -74,4 +74,8 @@ class Datacenter(object):
         if vm_to_install == vm_controller:
             return Fail('cannot install controller')
 
+    def install_vm(self, vm_name):
+        validation_error = self._validate_install_vm(vm_name)
+        if validation_error:
+            return validation_error
         return Success(None)
