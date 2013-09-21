@@ -10,7 +10,8 @@ setup(
     entry_points = {
         'console_scripts': [
             'esxi-list-vms = dittybox.scripts.esxi:list_vms',
-            'esxi-toggle-disk = dittybox.scripts.esxi:toggle_disk'
+            'esxi-toggle-disk = dittybox.scripts.esxi:toggle_disk',
+            'datacenter = dittybox.scripts.datacenter:main',
         ]
     }
 )
