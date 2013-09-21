@@ -8,7 +8,15 @@ def get_server(host, password):
     return server
 
 
-def main(args):
+def get_args_for_list_vms():
+    parser = argparse.ArgumentParser(description='List virtual machines')
+    parser.add_argument('host', help='ESXi host')
+    parser.add_argument('password', help='Password for root')
+    return parser.parse_args()
+
+
+def list_vms():
+    args = get_args_for_list_vms()
     server = get_server(args.host, args.password)
 
     for vmpath in server.get_registered_vms():
@@ -16,11 +24,3 @@ def main(args):
         print vm.properties.name, vm.get_status()
 
     server.disconnect()
-
-
-def list_vms():
-    parser = argparse.ArgumentParser(description='List virtual machines')
-    parser.add_argument('host', help='ESXi host')
-    parser.add_argument('password', help='Password for root')
-    args = parser.parse_args()
-    main(args)
