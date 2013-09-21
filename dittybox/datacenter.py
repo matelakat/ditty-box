@@ -75,7 +75,7 @@ class Datacenter(object):
             return Fail('cannot install controller')
 
     def _install_vm(self, vm_name):
-        return Success(None)
+        raise NotImplementedError()
 
     def install_vm(self, vm_name):
         validation_error = self._validate_install_vm(vm_name)

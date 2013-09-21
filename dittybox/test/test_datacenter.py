@@ -1,4 +1,5 @@
 import unittest
+import mock
 
 from dittybox import datacenter
 from dittybox import fake_hypervisor
@@ -38,6 +39,8 @@ class VMInstallValidationTest(unittest.TestCase):
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
         self.dc = datacenter.Datacenter(self.server)
+        self.install_vm_result = object()
+        self.dc._install_vm = mock.Mock(return_value=self.install_vm_result)
 
     def test_no_vm_found(self):
         result = self.dc.install_vm('vm1')
@@ -63,11 +66,11 @@ class VMInstallValidationTest(unittest.TestCase):
         self.assertTrue(result.failed)
         self.assertEquals('cannot install controller', result.data)
 
-    def test_vm_and_controller_found(self):
+    def test_valid(self):
         self.server.fake.add_vm('vm1')
         self.server.fake.add_vm('controller')
         self.dc.controller = datacenter.Controller('controller')
 
         result = self.dc.install_vm('vm1')
 
-        self.assertFalse(result.failed)
+        self.assertTrue(result is self.install_vm_result)
