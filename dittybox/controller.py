@@ -77,7 +77,6 @@ class SSHExecutor(Executor):
             password=self.password,
             eagerly_disconnect=True,
             abort_on_prompts=True,
-            combine_stderr=False,
         )
 
     def sudo(self, command):
@@ -94,11 +93,12 @@ class SSHExecutor(Executor):
             stdout = fabric_api.run('mktemp')
             stderr = fabric_api.run('mktemp')
 
-            result = fabric_api.sudo(
-                'bash %s >%s 2>%s' % (remote_script, stdout, stderr),
-                warn_only=True,
-                combine_stderr=False
-            )
+            with fabric_api.hide('warnings'):
+                result = fabric_api.sudo(
+                    'bash %s >%s 2>%s </dev/null' % (
+                        remote_script, stdout, stderr),
+                    warn_only=True,
+                )
 
             stdout_file = StringIO.StringIO()
             stderr_file = StringIO.StringIO()
