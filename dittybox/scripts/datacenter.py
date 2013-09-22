@@ -39,4 +39,3 @@ def main():
     cmd_.dc = datacenter.Datacenter(hv)
     cmd_.cmdloop()
     hv.disconnect()
-
