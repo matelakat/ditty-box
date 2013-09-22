@@ -40,7 +40,7 @@ class Fail(Result):
 
 
 class Datacenter(object):
-    def __init__(self, hypervisor, controller=None):
+    def __init__(self, hypervisor, controller):
         self.hypervisor = hypervisor
         self.controller = controller
 
@@ -82,11 +82,13 @@ class Datacenter(object):
 
         self.hypervisor.attach_disk(guest_disk, vm_controller)
         self.controller.plug_disk()
-        self.controller.install_to_disk()
+        install_result = self.controller.install_to_disk()
         self.controller.unplug_disk()
         self.hypervisor.detach_disk(guest_disk, vm_controller)
 
-        return Success(None)
+        message = 'Standard output:%s\nStandard error:%s\nReturn code:%s' % (
+            install_result.stdout, install_result.stderr, install_result.return_code)
+        return Success(message)
 
     def install_vm(self, vm_name):
         validation_result = self._validate_install_vm(vm_name)

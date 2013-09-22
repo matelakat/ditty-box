@@ -9,6 +9,11 @@ class SetupScriptProvider(object):
         pass
 
 
+class NullScriptProvider(SetupScriptProvider):
+    def generate_setup_script(self):
+        return 'fdisk -l'
+
+
 class FakeSetupScriptProvider(SetupScriptProvider):
     def generate_setup_script(self):
         return self.fake_setup_script

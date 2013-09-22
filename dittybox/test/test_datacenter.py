@@ -12,7 +12,7 @@ class VMListTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
-        self.dc = datacenter.Datacenter(self.server)
+        self.dc = datacenter.Datacenter(self.server, None)
 
     def test_server_listing(self):
         vms = self.dc.list_vms()
@@ -39,7 +39,7 @@ class VMInstallValidationTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
-        self.dc = datacenter.Datacenter(self.server)
+        self.dc = datacenter.Datacenter(self.server, None)
         self.install_vm_result = object()
 
     def test_no_vm_found(self):
@@ -98,9 +98,8 @@ class VMInstallTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor(self.fake_calls)
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
-        self.dc = datacenter.Datacenter(self.server)
+        self.dc = datacenter.Datacenter(self.server, None)
         self.dc.controller = controller.FakeController('controller', self.fake_calls)
-        self.dc._validate_install_vm = mock.Mock(return_value=None)
         self.vm = self.server.fake.add_vm('vm1')
         self.guest_disk, = self.vm.fake.add_disks('guest-disk')
         self.controller_vm = self.server.fake.add_vm('controller')

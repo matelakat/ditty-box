@@ -6,6 +6,8 @@ import importlib
 from dittybox import config
 from dittybox import hypervisor
 from dittybox import datacenter
+from dittybox import controller
+from dittybox import setup_scripts
 
 
 class DatacenterCommands(cmd.Cmd):
@@ -17,7 +19,17 @@ class DatacenterCommands(cmd.Cmd):
             print vm_name, pwr
 
     def do_vm_install(self, arg):
-        pass
+        result = self.dc.install_vm(arg)
+        if result.failed:
+            print "FAIL", result.data
+        else:
+            print "SUCCESS", result.data
+
+    def do_check_controller(self, arg):
+        self.dc.controller.check()
+
+    def do_show_install_script(self, arg):
+        print self.dc.controller.setup_script_provider.generate_setup_script()
 
 
 def main():
@@ -36,6 +48,14 @@ def main():
 
     hv = hypervisor.get_server(cfg.hypervisor.ip, cfg.hypervisor.password)
 
-    cmd_.dc = datacenter.Datacenter(hv)
+    executor = controller.SSHExecutor(cfg.controller)
+    ctr = controller.ShellController(
+        cfg.controller.vm_name,
+        executor,
+        setup_scripts.NullScriptProvider()
+        )
+
+    cmd_.dc = datacenter.Datacenter(hv, ctr)
     cmd_.cmdloop()
     hv.disconnect()
+    executor.disconnect()

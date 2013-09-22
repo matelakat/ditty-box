@@ -23,6 +23,10 @@ class Controller(object):
     def vm_name(self):
         pass
 
+    @abc.abstractmethod
+    def check(self):
+        pass
+
 
 class Executor(object):
     __metaclass__ = abc.ABCMeta
@@ -135,12 +139,16 @@ class ShellController(Controller):
         self.executor.sudo('echo "- - -" > /sys/class/scsi_host/host2/scan')
 
     def install_to_disk(self):
-        self.executor.sudo_script(
+        return self.executor.sudo_script(
             self.setup_script_provider.generate_setup_script())
 
     @property
     def vm_name(self):
         return self._vm_name
+
+    def check(self):
+        self.executor.sudo("true")
+        self.executor.sudo_script("true")
 
 
 class FakeController(Controller):
@@ -162,3 +170,7 @@ class FakeController(Controller):
 
     def install_to_disk(self):
         self.fake_call_collector.append(self.install_to_disk)
+        return ScriptResult('out', 'err', '0')
+
+    def check(self):
+        raise NotImplementedError()
