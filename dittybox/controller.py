@@ -27,6 +27,10 @@ class Controller(object):
     def check(self):
         pass
 
+    @abc.abstractmethod
+    def run_script(self, script):
+        pass
+
 
 class Executor(object):
     __metaclass__ = abc.ABCMeta
@@ -150,6 +154,9 @@ class ShellController(Controller):
         self.executor.sudo("true")
         self.executor.sudo_script("true")
 
+    def run_script(self, script):
+        return self.executor.sudo_script(script)
+
 
 class FakeController(Controller):
     def __init__(self, vm_name, fake_call_collector=None):
@@ -173,4 +180,7 @@ class FakeController(Controller):
         return ScriptResult('out', 'err', '0')
 
     def check(self):
+        raise NotImplementedError()
+
+    def run_script(self, script):
         raise NotImplementedError()

@@ -72,6 +72,14 @@ class DatacenterCommands(cmd.Cmd):
     def do_show_install_script(self, arg):
         print self.dc.controller.setup_script_provider.generate_setup_script()
 
+    def do_vm_test(self, args):
+        result = self.dc.vm_test(args)
+
+        if result.failed:
+            print "FAIL", result.data
+        else:
+            print "SUCCESS", result.data
+
 
 def main():
     parser = argparse.ArgumentParser(description='Datacenter shell')

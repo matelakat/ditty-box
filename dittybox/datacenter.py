@@ -1,4 +1,6 @@
 import abc
+import time
+import textwrap
 
 
 class Result(object):
@@ -135,3 +137,66 @@ class Datacenter(object):
         if validation_result.failed:
             return validation_result
         return self._install_vm(*validation_result.data)
+
+    def _vm_test(self, vm_controller, vm_to_test):
+        if not vm_to_test.powered_off:
+            vm_to_test.power_off()
+
+        for snapshot_name in vm_to_test.snapshots:
+            if snapshot_name == 'test':
+                vm_to_test.revert_to_snapshot('test')
+                break
+        else:
+            vm_to_test.create_snapshot('test')
+
+        guest_disk, = vm_to_test.disks
+
+        self.hypervisor.attach_disk(guest_disk, vm_controller)
+        self.controller.plug_disk()
+        with open('inject.sh', 'rb') as inject_file:
+            inject_result = self.controller.run_script(inject_file.read())
+        self.controller.unplug_disk()
+        self.hypervisor.detach_disk(guest_disk, vm_controller)
+        vm_to_test.power_on()
+
+        while not vm_to_test.powered_off:
+            time.sleep(1)
+
+        self.hypervisor.attach_disk(guest_disk, vm_controller)
+        self.controller.plug_disk()
+        with open('soak_up.sh', 'rb') as soak_up_file:
+            soak_up_result = self.controller.run_script(soak_up_file.read())
+        self.controller.unplug_disk()
+        self.hypervisor.detach_disk(guest_disk, vm_controller)
+        vm_to_test.power_on()
+
+        message = textwrap.dedent('''
+        = File Injection =
+        Standard output:
+        %s
+        Standard error:
+        %s
+        Return code:%s
+        = Soak up =
+        Standard output:
+        %s
+        Standard error:
+        %s
+        Return code:%s
+        ''') % (
+            inject_result.stdout,
+            inject_result.stderr,
+            inject_result.return_code,
+            soak_up_result.stdout,
+            soak_up_result.stderr,
+            soak_up_result.return_code)
+
+        return Success(message)
+
+    def vm_test(self, vm_name):
+        validation_result = self._validate_install_vm(vm_name)
+        if validation_result.failed:
+            return validation_result
+
+        vm_controller, vm_to_test, _ignored = validation_result.data
+        return self._vm_test(vm_controller, vm_to_test)
