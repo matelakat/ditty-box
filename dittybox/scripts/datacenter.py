@@ -18,6 +18,12 @@ class DatacenterCommands(cmd.Cmd):
         for vm_name, pwr in self.dc.list_vms():
             print vm_name, pwr
 
+    def do_vm_start(self, arg):
+        self.dc.vm_start(arg)
+
+    def do_vm_stop(self, arg):
+        self.dc.vm_stop(arg)
+
     def do_vm_install(self, arg):
         result = self.dc.install_vm(arg)
         if result.failed:
@@ -52,7 +58,7 @@ def main():
     ctr = controller.ShellController(
         cfg.controller.vm_name,
         executor,
-        setup_scripts.NullScriptProvider()
+        setup_scripts.PlainFileProvider('install_script.sh')
         )
 
     cmd_.dc = datacenter.Datacenter(hv, ctr)

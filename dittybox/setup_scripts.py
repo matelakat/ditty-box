@@ -9,9 +9,13 @@ class SetupScriptProvider(object):
         pass
 
 
-class NullScriptProvider(SetupScriptProvider):
+class PlainFileProvider(SetupScriptProvider):
+    def __init__(self, filename):
+        self.filename = filename
+
     def generate_setup_script(self):
-        return 'fdisk -l'
+        with open(self.filename, 'rb') as script_file:
+            return script_file.read()
 
 
 class FakeSetupScriptProvider(SetupScriptProvider):

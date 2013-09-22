@@ -50,6 +50,20 @@ class Datacenter(object):
             result.append((vm.name, 'OFF' if vm.powered_off else 'NOT OFF'))
         return result
 
+    def vm_start(self, vm_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                vm.power_on()
+                return "VM started"
+        return "VM not found"
+
+    def vm_stop(self, vm_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                vm.power_off()
+                return "VM stopped"
+        return "VM not found"
+
     def _validate_install_vm(self, vm_name):
         vm_to_install = None
         vm_controller = None
