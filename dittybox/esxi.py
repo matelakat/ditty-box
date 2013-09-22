@@ -17,9 +17,8 @@ class ESXiDisk(hypervisor.Disk):
 
 
 class ESXiVM(hypervisor.VM):
-    def __init__(self, name, power_state, esxi_server):
+    def __init__(self, name, esxi_server):
         self._name = name
-        self._power_state = power_state
         self.esxi_server = esxi_server
 
     @property
@@ -32,7 +31,14 @@ class ESXiVM(hypervisor.VM):
 
     @property
     def esxi_power_state(self):
-        return self._power_state
+        props = self.esxi_server._retrieve_properties_traversal(
+            property_names=['config.name', 'runtime.powerState'],
+            obj_type="VirtualMachine")
+
+        for prop_set in props:
+            name = prop_set.PropSet[0].Val
+            if name == self._name:
+                return prop_set.PropSet[1].Val
 
     @property
     def disks(self):
@@ -74,13 +80,12 @@ class ESXiServer(hypervisor.Server):
     @property
     def vms(self):
         props = self.esxi_server._retrieve_properties_traversal(
-            property_names=['config.name', 'runtime.powerState'],
+            property_names=['config.name'],
             obj_type="VirtualMachine")
 
         for prop_set in props:
             name = prop_set.PropSet[0].Val
-            power_state = prop_set.PropSet[1].Val
-            yield ESXiVM(name, power_state, self.esxi_server)
+            yield ESXiVM(name, self.esxi_server)
 
     def disconnect(self):
         self.esxi_server.disconnect()
