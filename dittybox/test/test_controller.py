@@ -36,6 +36,6 @@ class TestShellController(unittest.TestCase):
         ctrl = controller.ShellController(
             'vm', fake_exec, setup_script_provider)
 
-        ctrl.debootstrap_to_disk()
+        ctrl.install_to_disk()
 
         self.assertEquals(['script'], fake_exec.fake_executed_scripts)

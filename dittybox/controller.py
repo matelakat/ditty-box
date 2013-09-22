@@ -13,7 +13,7 @@ class Controller(object):
         pass
 
     @abc.abstractmethod
-    def debootstrap_to_disk(self):
+    def install_to_disk(self):
         pass
 
     @abc.abstractproperty
@@ -57,7 +57,7 @@ class ShellController(Controller):
     def plug_disk(self):
         self.executor.sudo('echo "- - -" > /sys/class/scsi_host/host2/scan')
 
-    def debootstrap_to_disk(self):
+    def install_to_disk(self):
         self.executor.sudo_script(
             self.setup_script_provider.generate_setup_script())
 
@@ -83,5 +83,5 @@ class FakeController(Controller):
     def unplug_disk(self):
         self.fake_call_collector.append(self.unplug_disk)
 
-    def debootstrap_to_disk(self):
-        self.fake_call_collector.append(self.debootstrap_to_disk)
+    def install_to_disk(self):
+        self.fake_call_collector.append(self.install_to_disk)

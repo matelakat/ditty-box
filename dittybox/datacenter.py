@@ -82,7 +82,7 @@ class Datacenter(object):
 
         self.hypervisor.attach_disk(guest_disk, vm_controller)
         self.controller.plug_disk()
-        self.controller.debootstrap_to_disk()
+        self.controller.install_to_disk()
         self.controller.unplug_disk()
         self.hypervisor.detach_disk(guest_disk, vm_controller)
 
