@@ -15,9 +15,7 @@ def sudo():
 
     executor = controller.SSHExecutor(args)
 
-    f = StringIO.StringIO(args.command)
-
-    result = executor.sudo_script(f)
+    result = executor.sudo_script(args.command)
     executor.disconnect()
 
     sys.stdout.flush()

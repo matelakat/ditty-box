@@ -84,14 +84,17 @@ class SSHExecutor(Executor):
             return fabric_api.sudo(command)
 
     def sudo_script(self, script):
+        script_file = StringIO.StringIO(script)
+
         with self._settings():
             remote_script = fabric_api.run('mktemp')
-
-            fabric_api.put(
-                local_path=script, remote_path=remote_script, use_sudo=True)
-
             stdout = fabric_api.run('mktemp')
             stderr = fabric_api.run('mktemp')
+
+            fabric_api.put(
+                local_path=script_file,
+                remote_path=remote_script,
+                use_sudo=True)
 
             with fabric_api.hide('warnings'):
                 result = fabric_api.sudo(
