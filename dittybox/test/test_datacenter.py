@@ -2,6 +2,7 @@ import unittest
 import mock
 
 from dittybox import datacenter
+from dittybox import controller
 from dittybox import fake_hypervisor
 from dittybox import hypervisor
 
@@ -49,7 +50,7 @@ class VMInstallValidationTest(unittest.TestCase):
 
     def test_vm_found_but_no_controller_found(self):
         self.server.fake.add_vm('vm1')
-        self.dc.controller = datacenter.FakeController('controller')
+        self.dc.controller = controller.FakeController('controller')
 
         result = self.dc._validate_install_vm('vm1')
 
@@ -58,7 +59,7 @@ class VMInstallValidationTest(unittest.TestCase):
 
     def test_install_controller_fails(self):
         self.server.fake.add_vm('controller')
-        self.dc.controller = datacenter.FakeController('controller')
+        self.dc.controller = controller.FakeController('controller')
 
         result = self.dc._validate_install_vm('controller')
 
@@ -68,7 +69,7 @@ class VMInstallValidationTest(unittest.TestCase):
     def test_controller_is_busy(self):
         self.server.fake.add_vm('vm1')
         self.server.fake.add_vm('controller').fake.add_disks('disk1', 'disk2')
-        self.dc.controller = datacenter.FakeController('controller')
+        self.dc.controller = controller.FakeController('controller')
 
         result = self.dc._validate_install_vm('vm1')
 
@@ -79,16 +80,16 @@ class VMInstallValidationTest(unittest.TestCase):
     def test_valid(self):
         guest = self.server.fake.add_vm('vm1')
         guest_disk, = guest.fake.add_disks('guest-disk')
-        controller = self.server.fake.add_vm('controller')
-        controller.fake.add_disks('disk1')
-        self.dc.controller = datacenter.FakeController('controller')
+        ctrl = self.server.fake.add_vm('controller')
+        ctrl.fake.add_disks('disk1')
+        self.dc.controller = controller.FakeController('controller')
 
         result = self.dc._validate_install_vm('vm1')
 
         self.assertFalse(result.failed)
 
         self.assertEquals(
-            (controller, guest, guest_disk), result.data)
+            (ctrl, guest, guest_disk), result.data)
 
 
 class VMInstallTest(unittest.TestCase):
@@ -98,7 +99,7 @@ class VMInstallTest(unittest.TestCase):
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
         self.dc = datacenter.Datacenter(self.server)
-        self.dc.controller = datacenter.FakeController('controller', self.fake_calls)
+        self.dc.controller = controller.FakeController('controller', self.fake_calls)
         self.dc._validate_install_vm = mock.Mock(return_value=None)
         self.vm = self.server.fake.add_vm('vm1')
         self.guest_disk, = self.vm.fake.add_disks('guest-disk')
