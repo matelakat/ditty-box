@@ -57,6 +57,19 @@ class FakeVM(hypervisor.VM):
     def powered_off(self):
         return self._powered_off
 
+    @property
+    def snapshots(self):
+        raise NotImplementedError()
+
+    def create_snapshot(self, snapshot_name):
+        raise NotImplementedError()
+
+    def revert_to_snapshot(self, snapshot_name):
+        raise NotImplementedError()
+
+    def delete_snapshot(self, snapshot_name):
+        raise NotImplementedError()
+
 
 class FakeServerMethods(object):
     def __init__(self, fake_call_collector):

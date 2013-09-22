@@ -52,6 +52,20 @@ class ESXiVM(hypervisor.VM):
     def powered_off(self):
         return self.esxi_power_state == "poweredOff"
 
+    @property
+    def snapshots(self):
+        for snapshot in self.esxi_vm.get_snapshots():
+            yield snapshot.get_name()
+
+    def create_snapshot(self, snapshot_name):
+        self.esxi_vm.create_snapshot(snapshot_name)
+
+    def revert_to_snapshot(self, snapshot_name):
+        self.esxi_vm.revert_to_named_snapshot(snapshot_name)
+
+    def delete_snapshot(self, snapshot_name):
+        self.esxi_vm.delete_named_snapshot(snapshot_name)
+
 
 class ESXiServer(hypervisor.Server):
     def __init__(self, esxi_server):

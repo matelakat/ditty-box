@@ -64,6 +64,32 @@ class Datacenter(object):
                 return "VM stopped"
         return "VM not found"
 
+    def vm_create_snapshot(self, vm_name, snapshot_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                vm.create_snapshot(snapshot_name)
+                return "Snapshot created"
+        return "VM not found"
+
+    def vm_delete_snapshot(self, vm_name, snapshot_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                vm.delete_snapshot(snapshot_name)
+                return "Snapshot deleted"
+        return "VM not found"
+
+    def vm_revert_snapshot(self, vm_name, snapshot_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                vm.revert_to_snapshot(snapshot_name)
+                return "Snapshot reverted"
+        return "VM not found"
+
+    def vm_list_snapshots(self, vm_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                return list(vm.snapshots)
+
     def _validate_install_vm(self, vm_name):
         vm_to_install = None
         vm_controller = None

@@ -51,6 +51,24 @@ class VM(object):
     def power_off(self):
         pass
 
+    @abc.abstractproperty
+    def snapshots(self):
+        pass
+
+    @abc.abstractmethod
+    def create_snapshot(self, snapshot_name):
+        pass
+
+    @abc.abstractmethod
+    def revert_to_snapshot(self, snapshot_name):
+        pass
+
+    @abc.abstractmethod
+    def delete_snapshot(self, snapshot_name):
+        pass
+
+
+
 
 class Disk(object):
     __metaclass__ = abc.ABCMeta
