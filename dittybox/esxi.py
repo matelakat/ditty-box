@@ -21,13 +21,10 @@ class ESXiVM(hypervisor.VM):
         self._name = name
         self._power_state = power_state
         self.esxi_server = esxi_server
-        self._vm = None
 
     @property
     def esxi_vm(self):
-        if self._vm is None:
-            self._vm = self.esxi_server.get_vm_by_name(self.name)
-        return self._vm
+        return self.esxi_server.get_vm_by_name(self.name)
 
     @property
     def name(self):
