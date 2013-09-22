@@ -1,5 +1,6 @@
 import argparse
 import StringIO
+import sys
 
 from dittybox import controller
 
@@ -16,5 +17,11 @@ def sudo():
 
     f = StringIO.StringIO(args.command)
 
-    out = executor.sudo_script(f)
-    print out
+    result = executor.sudo_script(f)
+    executor.disconnect()
+
+    sys.stdout.flush()
+
+    print "Result code:", result.return_code
+    print "Standard out:", result.stdout
+    print "Standard error:", result.stderr

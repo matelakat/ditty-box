@@ -1,5 +1,7 @@
 import abc
+import StringIO
 from fabric import api as fabric_api
+from fabric import network as fabric_network
 
 
 class Controller(object):
@@ -33,6 +35,10 @@ class Executor(object):
     def sudo_script(self, script, *params):
         pass
 
+    @abc.abstractmethod
+    def disconnect(self):
+        pass
+
 
 class FakeExecutor(Executor):
     def __init__(self):
@@ -45,6 +51,16 @@ class FakeExecutor(Executor):
     def sudo_script(self, script):
         self.fake_executed_scripts.append(script)
 
+    def disconnect(self):
+        raise NotImplementedError()
+
+
+class ScriptResult(object):
+    def __init__(self, out, err, return_code):
+        self.stdout = out
+        self.stderr = err
+        self.return_code = return_code
+
 
 class SSHExecutor(Executor):
     def __init__(self, params):
@@ -54,12 +70,15 @@ class SSHExecutor(Executor):
 
     def _settings(self):
         return fabric_api.settings(
+            fabric_api.hide('stdout'), fabric_api.hide('stderr'),
             host_string=self.host,
             ssh_config_path=self.ssh_config,
             use_ssh_config=True,
             password=self.password,
             eagerly_disconnect=True,
-            abort_on_prompts=True)
+            abort_on_prompts=True,
+            combine_stderr=False,
+        )
 
     def sudo(self, command):
         with self._settings():
@@ -67,10 +86,37 @@ class SSHExecutor(Executor):
 
     def sudo_script(self, script):
         with self._settings():
-            tempfile = fabric_api.sudo('mktemp')
+            remote_script = fabric_api.run('mktemp')
+
             fabric_api.put(
-                local_path=script, remote_path=tempfile, use_sudo=True)
-            return fabric_api.sudo('bash %s' % tempfile)
+                local_path=script, remote_path=remote_script, use_sudo=True)
+
+            stdout = fabric_api.run('mktemp')
+            stderr = fabric_api.run('mktemp')
+
+            result = fabric_api.sudo(
+                'bash %s >%s 2>%s' % (remote_script, stdout, stderr),
+                warn_only=True,
+                combine_stderr=False
+            )
+
+            stdout_file = StringIO.StringIO()
+            stderr_file = StringIO.StringIO()
+
+            fabric_api.get(stdout, local_path=stdout_file)
+            fabric_api.get(stderr, local_path=stderr_file)
+
+            fabric_api.sudo(
+                'rm -f %s %s %s' % (stdout, stderr, remote_script))
+
+            return ScriptResult(
+                stdout_file.getvalue(),
+                stderr_file.getvalue(),
+                result.return_code,
+            )
+
+    def disconnect(self):
+        fabric_network.disconnect_all()
 
 
 class ShellController(Controller):
