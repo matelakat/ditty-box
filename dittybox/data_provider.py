@@ -32,7 +32,7 @@ class SimpleDataProvider(DataProvider):
                 return m.hexdigest()
 
     def get_stream(self):
-        raise NotImplementedError()
+        return self.filesystem.stream_of(self.data_path)
 
 
 class FakeDataProvider(DataProvider):
@@ -41,4 +41,3 @@ class FakeDataProvider(DataProvider):
 
     def get_stream(self):
         return self.fake_stream
-

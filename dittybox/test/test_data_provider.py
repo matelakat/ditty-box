@@ -19,3 +19,11 @@ class TestDataProvider(unittest.TestCase):
         self.assertEquals(digest, dp.get_md5())
 
         self.assertEquals(0, fs.open_files)
+
+    def test_get_stream(self):
+        fs = filesystem.FakeFilesystem()
+        fs.content_by_path['somepath'] = 'somedata'
+        dp = data_provider.SimpleDataProvider(fs, 'somepath')
+
+        self.assertEquals('somedata', dp.get_stream().read())
+
