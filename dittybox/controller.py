@@ -1,3 +1,4 @@
+import time
 import abc
 import StringIO
 from fabric import api as fabric_api
@@ -31,6 +32,10 @@ class Controller(object):
     def run_script(self, script):
         pass
 
+    @abc.abstractmethod
+    def inject_onetime_script(self):
+        pass
+
 
 class Executor(object):
     __metaclass__ = abc.ABCMeta
@@ -47,20 +52,39 @@ class Executor(object):
     def disconnect(self):
         pass
 
+    @abc.abstractmethod
+    def put(self, contents, remote_location):
+        pass
+
+    @abc.abstractmethod
+    def wait(self):
+        pass
+
 
 class FakeExecutor(Executor):
     def __init__(self):
-        self.fake_executed_commands = []
-        self.fake_executed_scripts = []
+        self.fake_calls = []
+        self.fake_sudo_failures = []
 
     def sudo(self, command):
-        self.fake_executed_commands.append(command)
+        call = (self.sudo, command)
+        self.fake_calls.append(call)
+        if call in self.fake_sudo_failures:
+            self.fake_sudo_failures.remove(call)
+            return False
+        return True
 
     def sudo_script(self, script):
-        self.fake_executed_scripts.append(script)
+        self.fake_calls.append((self.sudo_script, script))
 
     def disconnect(self):
         raise NotImplementedError()
+
+    def put(self, filelike, remote_location):
+        self.fake_calls.append((self.put, filelike, remote_location))
+
+    def wait(self):
+        self.fake_calls.append((self.wait,))
 
 
 class ScriptResult(object):
@@ -85,11 +109,13 @@ class SSHExecutor(Executor):
             password=self.password,
             eagerly_disconnect=True,
             abort_on_prompts=True,
+            warn_only=True,
         )
 
     def sudo(self, command):
         with self._settings():
-            return fabric_api.sudo(command)
+            result = fabric_api.sudo(command)
+            return result.succeeded
 
     def sudo_script(self, script):
         script_file = StringIO.StringIO(script)
@@ -108,7 +134,6 @@ class SSHExecutor(Executor):
                 result = fabric_api.sudo(
                     'bash %s >%s 2>%s </dev/null' % (
                         remote_script, stdout, stderr),
-                    warn_only=True,
                 )
 
             stdout_file = StringIO.StringIO()
@@ -128,6 +153,16 @@ class SSHExecutor(Executor):
 
     def disconnect(self):
         fabric_network.disconnect_all()
+
+    def put(self, filelike, remote_location):
+        with self._settings():
+            fabric_api.put(
+                local_path=filelike,
+                remote_path=remote_location,
+                use_sudo=True)
+
+    def wait(self):
+        time.sleep(0.5)
 
 
 class ShellController(Controller):
@@ -157,6 +192,18 @@ class ShellController(Controller):
     def run_script(self, script):
         return self.executor.sudo_script(script)
 
+    def inject_onetime_script(self):
+        self.executor.sudo("mkdir -p /mnt/ubuntu")
+        self.executor.sudo("mount /dev/sdb1 /mnt/ubuntu")
+        self.executor.put(
+            self.setup_script_provider.generate_onetime_script(),
+            '/mnt/ubuntu/root/install.sh')
+        self.executor.put(
+            self.setup_script_provider.generate_upstart_script(),
+            '/mnt/ubuntu/etc/init/install.conf')
+        while not self.executor.sudo("umount /dev/sdb1"):
+            self.executor.wait()
+
 
 class FakeController(Controller):
     def __init__(self, vm_name, fake_call_collector=None):
@@ -183,4 +230,7 @@ class FakeController(Controller):
         raise NotImplementedError()
 
     def run_script(self, script):
+        raise NotImplementedError()
+
+    def inject_onetime_script(self):
         raise NotImplementedError()

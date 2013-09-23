@@ -153,8 +153,7 @@ class Datacenter(object):
 
         self.hypervisor.attach_disk(guest_disk, vm_controller)
         self.controller.plug_disk()
-        with open('inject.sh', 'rb') as inject_file:
-            inject_result = self.controller.run_script(inject_file.read())
+        self.controller.inject_onetime_script()
         self.controller.unplug_disk()
         self.hypervisor.detach_disk(guest_disk, vm_controller)
         vm_to_test.power_on()
@@ -171,12 +170,6 @@ class Datacenter(object):
         vm_to_test.power_on()
 
         message = textwrap.dedent('''
-        = File Injection =
-        Standard output:
-        %s
-        Standard error:
-        %s
-        Return code:%s
         = Soak up =
         Standard output:
         %s
@@ -184,9 +177,6 @@ class Datacenter(object):
         %s
         Return code:%s
         ''') % (
-            inject_result.stdout,
-            inject_result.stderr,
-            inject_result.return_code,
             soak_up_result.stdout,
             soak_up_result.stderr,
             soak_up_result.return_code)

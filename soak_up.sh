@@ -15,7 +15,7 @@ echo "# INSTALL LOG"
 cat /mnt/ubuntu/root/install.log
 echo "[COLLECTED INFORMATION END]"
 
-rm -f /mnt/ubuntu/etc/init/test.conf
+rm -f /mnt/ubuntu/etc/init/install.conf
 
 while mount | grep "/mnt/ubuntu"; do
     umount /mnt/ubuntu | true

@@ -101,7 +101,10 @@ def main():
     ctr = controller.ShellController(
         cfg.controller.vm_name,
         executor,
-        setup_scripts.PlainFileProvider('install_script.sh')
+        setup_scripts.PlainFileProvider(
+            setup_scripts.LocalFilesystem(),
+            'install_script.sh',
+            'onetime.sh')
         )
 
     cmd_.dc = datacenter.Datacenter(hv, ctr)

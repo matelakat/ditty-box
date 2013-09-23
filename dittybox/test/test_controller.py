@@ -5,6 +5,9 @@ from dittybox import setup_scripts
 
 
 class TestShellController(unittest.TestCase):
+    def setUp(self):
+        self.maxDiff = None
+
     def test_vm_name(self):
         ctrl = controller.ShellController('vmname', None, None)
         self.assertEquals('vmname', ctrl.vm_name)
@@ -16,8 +19,8 @@ class TestShellController(unittest.TestCase):
         ctrl.unplug_disk()
 
         self.assertEquals(
-            ['echo "1" > /sys/block/sdb/device/delete'],
-            fake_exec.fake_executed_commands)
+            [(fake_exec.sudo, 'echo "1" > /sys/block/sdb/device/delete')],
+            fake_exec.fake_calls)
 
     def test_plug_disk(self):
         fake_exec = controller.FakeExecutor()
@@ -25,9 +28,9 @@ class TestShellController(unittest.TestCase):
 
         ctrl.plug_disk()
 
-        self.assertEquals(
-            ['echo "- - -" > /sys/class/scsi_host/host2/scan'],
-            fake_exec.fake_executed_commands)
+        self.assertEquals([
+            (fake_exec.sudo, 'echo "- - -" > /sys/class/scsi_host/host2/scan')
+            ], fake_exec.fake_calls)
 
     def test_debootstrap_to_disk(self):
         fake_exec = controller.FakeExecutor()
@@ -38,4 +41,49 @@ class TestShellController(unittest.TestCase):
 
         ctrl.install_to_disk()
 
-        self.assertEquals(['script'], fake_exec.fake_executed_scripts)
+        self.assertEquals([
+            (fake_exec.sudo_script, 'script')
+            ], fake_exec.fake_calls)
+
+    def test_upload_install_script_no_errors_on_umount(self):
+        fake_exec = controller.FakeExecutor()
+        setup_script_provider = setup_scripts.FakeSetupScriptProvider()
+        setup_script_provider.fake_upstart_script = 'upstart_script'
+        setup_script_provider.fake_onetime_script = 'somescript'
+
+        ctrl = controller.ShellController(
+            'vm', fake_exec, setup_script_provider)
+
+        ctrl.inject_onetime_script()
+
+        self.assertEquals([
+            (fake_exec.sudo, 'mkdir -p /mnt/ubuntu'),
+            (fake_exec.sudo, 'mount /dev/sdb1 /mnt/ubuntu'),
+            (fake_exec.put, 'somescript', '/mnt/ubuntu/root/install.sh'),
+            (fake_exec.put, 'upstart_script', '/mnt/ubuntu/etc/init/install.conf'),
+            (fake_exec.sudo, 'umount /dev/sdb1'),
+            ],
+            fake_exec.fake_calls)
+
+    def test_upload_install_script_umount_errors(self):
+        fake_exec = controller.FakeExecutor()
+        fake_exec.fake_sudo_failures = [(fake_exec.sudo, 'umount /dev/sdb1')] * 2
+        setup_script_provider = setup_scripts.FakeSetupScriptProvider()
+        setup_script_provider.fake_upstart_script = 'upstart_script'
+        setup_script_provider.fake_onetime_script = 'somescript'
+
+        ctrl = controller.ShellController('vm', fake_exec, setup_script_provider)
+        ctrl.inject_onetime_script()
+
+        self.assertEquals([
+            (fake_exec.sudo, 'mkdir -p /mnt/ubuntu'),
+            (fake_exec.sudo, 'mount /dev/sdb1 /mnt/ubuntu'),
+            (fake_exec.put, 'somescript', '/mnt/ubuntu/root/install.sh'),
+            (fake_exec.put, 'upstart_script', '/mnt/ubuntu/etc/init/install.conf'),
+            (fake_exec.sudo, 'umount /dev/sdb1'),
+            (fake_exec.wait,),
+            (fake_exec.sudo, 'umount /dev/sdb1'),
+            (fake_exec.wait,),
+            (fake_exec.sudo, 'umount /dev/sdb1'),
+            ],
+            fake_exec.fake_calls)
