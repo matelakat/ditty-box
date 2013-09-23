@@ -18,7 +18,7 @@ class TestPlainProvider(unittest.TestCase):
     def test_generate_upstart_script(self):
         prov = setup_scripts.PlainFileProvider(None, None, None)
 
-        upstart_script = prov.generate_upstart_script()
+        upstart_script = prov.generate_upstart_stream()
         self.assertTrue('start on runlevel' in upstart_script.read())
 
     def test_generate_onetime_script(self):

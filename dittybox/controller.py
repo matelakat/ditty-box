@@ -199,7 +199,7 @@ class ShellController(Controller):
             self.setup_script_provider.generate_onetime_script(),
             '/mnt/ubuntu/root/install.sh')
         self.executor.put(
-            self.setup_script_provider.generate_upstart_script(),
+            self.setup_script_provider.generate_upstart_stream(),
             '/mnt/ubuntu/etc/init/install.conf')
         while not self.executor.sudo("umount /dev/sdb1"):
             self.executor.wait()

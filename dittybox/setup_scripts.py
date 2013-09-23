@@ -11,7 +11,7 @@ class SetupScriptProvider(object):
         pass
 
     @abc.abstractmethod
-    def generate_upstart_script(self):
+    def generate_upstart_stream(self):
         pass
 
     @abc.abstractmethod
@@ -50,7 +50,7 @@ class PlainFileProvider(SetupScriptProvider):
     def generate_setup_script(self):
         return self.filesystem.contents_of(self.filename)
 
-    def generate_upstart_script(self):
+    def generate_upstart_stream(self):
         return StringIO.StringIO(textwrap.dedent('''
         start on runlevel [2345]
 
@@ -73,7 +73,7 @@ class FakeSetupScriptProvider(SetupScriptProvider):
     def generate_setup_script(self):
         return self.fake_setup_script
 
-    def generate_upstart_script(self):
+    def generate_upstart_stream(self):
         return self.fake_upstart_script
 
     def generate_onetime_script(self):
