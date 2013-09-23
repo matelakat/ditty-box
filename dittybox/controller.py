@@ -197,17 +197,23 @@ class ShellController(Controller):
     def run_script(self, script):
         return self.executor.sudo_script(script)
 
-    def inject_onetime_script(self):
+    def _mount_guest_disk(self):
         self.executor.sudo("mkdir -p /mnt/ubuntu")
         self.executor.sudo("mount /dev/sdb1 /mnt/ubuntu")
+
+    def _unmount_guest_disk(self):
+        while not self.executor.sudo("umount /dev/sdb1"):
+            self.executor.wait()
+
+    def inject_onetime_script(self):
+        self._mount_guest_disk()
         self.executor.put(
             self.setup_script_provider.generate_onetime_stream(),
             '/mnt/ubuntu/root/install.sh')
         self.executor.put(
             self.setup_script_provider.generate_upstart_stream(),
             '/mnt/ubuntu/etc/init/install.conf')
-        while not self.executor.sudo("umount /dev/sdb1"):
-            self.executor.wait()
+        self._unmount_guest_disk()
 
     def upload_data(self, data_provider):
         self.executor.sudo('mkdir -p /datacenter_data')
