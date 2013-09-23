@@ -7,7 +7,7 @@ from dittybox import config
 from dittybox import hypervisor
 from dittybox import datacenter
 from dittybox import controller
-from dittybox import setup_scripts
+from dittybox import script_provider
 
 
 class DatacenterCommands(cmd.Cmd):
@@ -101,8 +101,8 @@ def main():
     ctr = controller.ShellController(
         cfg.controller.vm_name,
         executor,
-        setup_scripts.PlainFileProvider(
-            setup_scripts.LocalFilesystem(),
+        script_provider.PlainFileProvider(
+            script_provider.LocalFilesystem(),
             'install_script.sh',
             'onetime.sh')
         )

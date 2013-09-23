@@ -1,31 +1,31 @@
 import unittest
 
-from dittybox import setup_scripts
+from dittybox import script_provider
 
 
 class TestPlainProvider(unittest.TestCase):
     def test_generate_setup_script(self):
-        fs = setup_scripts.FakeFilesystem()
+        fs = script_provider.FakeFilesystem()
 
         fs.content_by_path['/path/to/setup/script'] = 'setupscript'
         fs.content_by_path['/path/to/onetime/script'] = 'onetimescript'
 
-        prov = setup_scripts.PlainFileProvider(
+        prov = script_provider.PlainFileProvider(
             fs, '/path/to/setup/script', '/path/to/onetime/script')
 
         self.assertEquals('setupscript', prov.generate_setup_script())
 
     def test_generate_upstart_script(self):
-        prov = setup_scripts.PlainFileProvider(None, None, None)
+        prov = script_provider.PlainFileProvider(None, None, None)
 
         upstart_script = prov.generate_upstart_stream()
         self.assertTrue('start on runlevel' in upstart_script.read())
 
     def test_generate_onetime_script(self):
-        fs = setup_scripts.FakeFilesystem()
+        fs = script_provider.FakeFilesystem()
         fs.content_by_path['/path/to/onetime/script'] = 'onetimescript'
 
-        prov = setup_scripts.PlainFileProvider(
+        prov = script_provider.PlainFileProvider(
             fs, None, '/path/to/onetime/script')
 
         self.assertEquals(

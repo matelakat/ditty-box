@@ -1,7 +1,7 @@
 import unittest
 
 from dittybox import controller
-from dittybox import setup_scripts
+from dittybox import script_provider
 
 
 class TestShellController(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestShellController(unittest.TestCase):
 
     def test_debootstrap_to_disk(self):
         fake_exec = controller.FakeExecutor()
-        setup_script_provider = setup_scripts.FakeSetupScriptProvider()
+        setup_script_provider = script_provider.FakeSetupScriptProvider()
         setup_script_provider.fake_setup_script = 'script'
         ctrl = controller.ShellController(
             'vm', fake_exec, setup_script_provider)
@@ -47,7 +47,7 @@ class TestShellController(unittest.TestCase):
 
     def test_upload_install_script_no_errors_on_umount(self):
         fake_exec = controller.FakeExecutor()
-        setup_script_provider = setup_scripts.FakeSetupScriptProvider()
+        setup_script_provider = script_provider.FakeSetupScriptProvider()
         setup_script_provider.fake_upstart_script = 'upstart_script'
         setup_script_provider.fake_onetime_script = 'somescript'
 
@@ -68,7 +68,7 @@ class TestShellController(unittest.TestCase):
     def test_upload_install_script_umount_errors(self):
         fake_exec = controller.FakeExecutor()
         fake_exec.fake_sudo_failures = [(fake_exec.sudo, 'umount /dev/sdb1')] * 2
-        setup_script_provider = setup_scripts.FakeSetupScriptProvider()
+        setup_script_provider = script_provider.FakeSetupScriptProvider()
         setup_script_provider.fake_upstart_script = 'upstart_script'
         setup_script_provider.fake_onetime_script = 'somescript'
 
