@@ -42,10 +42,10 @@ class LocalFilesystem(Filesystem):
 
 
 class PlainFileProvider(SetupScriptProvider):
-    def __init__(self, filesystem, setup_script_path, onetime_script):
+    def __init__(self, filesystem, setup_script_path, onetime_script_path):
         self.filesystem = filesystem
         self.setup_script_path = setup_script_path
-        self.onetime_script_filename = onetime_script
+        self.onetime_script_filename = onetime_script_path
 
     def generate_setup_script(self):
         return self.filesystem.contents_of(self.setup_script_path)
