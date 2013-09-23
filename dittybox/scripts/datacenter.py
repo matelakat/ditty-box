@@ -8,6 +8,7 @@ from dittybox import hypervisor
 from dittybox import datacenter
 from dittybox import controller
 from dittybox import script_provider
+from dittybox import filesystem
 
 
 class DatacenterCommands(cmd.Cmd):
@@ -102,7 +103,7 @@ def main():
         cfg.controller.vm_name,
         executor,
         script_provider.PlainFileProvider(
-            script_provider.LocalFilesystem(),
+            filesystem.LocalFilesystem(),
             'install_script.sh',
             'onetime.sh')
         )

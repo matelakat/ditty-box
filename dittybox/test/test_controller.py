@@ -1,7 +1,10 @@
 import unittest
 
+from dittybox.test import FakeStream
+
 from dittybox import controller
 from dittybox import script_provider
+from dittybox import data_provider
 
 
 class TestShellController(unittest.TestCase):
@@ -85,5 +88,43 @@ class TestShellController(unittest.TestCase):
             (fake_exec.sudo, 'umount /dev/sdb1'),
             (fake_exec.wait,),
             (fake_exec.sudo, 'umount /dev/sdb1'),
+            ],
+            fake_exec.fake_calls)
+
+    def test_upload_data_first_time(self):
+        fake_exec = controller.FakeExecutor()
+        fake_exec.fake_sudo_failures = [
+            (fake_exec.sudo, 'test -f /datacenter_data/md5sum')]
+        dp = data_provider.FakeDataProvider()
+        dp.fake_md5sum = 'md5sum'
+        dp.fake_stream = FakeStream()
+
+        ctrl = controller.ShellController('vm', fake_exec, None)
+
+        ctrl.upload_data(dp)
+
+        self.assertEquals([
+            (fake_exec.sudo, 'mkdir -p /datacenter_data'),
+            (fake_exec.sudo, 'test -f /datacenter_data/md5sum'),
+            (fake_exec.put, dp.fake_stream, '/datacenter_data/md5sum'),
+            (fake_exec.sudo, 'cp /datacenter_data/md5sum /mnt/ubuntu/root/data.blob'),
+            ],
+            fake_exec.fake_calls)
+
+        self.assertTrue(dp.fake_stream.closed)
+
+    def test_upload_data_found_in_cache(self):
+        fake_exec = controller.FakeExecutor()
+        dp = data_provider.FakeDataProvider()
+        dp.fake_md5sum = 'md5sum'
+
+        ctrl = controller.ShellController('vm', fake_exec, None)
+
+        ctrl.upload_data(dp)
+
+        self.assertEquals([
+            (fake_exec.sudo, 'mkdir -p /datacenter_data'),
+            (fake_exec.sudo, 'test -f /datacenter_data/md5sum'),
+            (fake_exec.sudo, 'cp /datacenter_data/md5sum /mnt/ubuntu/root/data.blob'),
             ],
             fake_exec.fake_calls)

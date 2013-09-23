@@ -1,6 +1,7 @@
 import time
 import abc
 import StringIO
+import contextlib
 from fabric import api as fabric_api
 from fabric import network as fabric_network
 
@@ -34,6 +35,10 @@ class Controller(object):
 
     @abc.abstractmethod
     def inject_onetime_script(self):
+        pass
+
+    @abc.abstractmethod
+    def upload_data(self, data_provider):
         pass
 
 
@@ -204,6 +209,15 @@ class ShellController(Controller):
         while not self.executor.sudo("umount /dev/sdb1"):
             self.executor.wait()
 
+    def upload_data(self, data_provider):
+        self.executor.sudo('mkdir -p /datacenter_data')
+        fname = data_provider.get_md5()
+        fpath = "/datacenter_data/%s" % fname
+        if not self.executor.sudo('test -f %s' % fpath):
+            with contextlib.closing(data_provider.get_stream()) as stream:
+                self.executor.put(stream, fpath)
+        self.executor.sudo('cp %s /mnt/ubuntu/root/data.blob' % fpath)
+
 
 class FakeController(Controller):
     def __init__(self, vm_name, fake_call_collector=None):
@@ -233,4 +247,7 @@ class FakeController(Controller):
         raise NotImplementedError()
 
     def inject_onetime_script(self):
+        raise NotImplementedError()
+
+    def upload_data(self, data_provider):
         raise NotImplementedError()

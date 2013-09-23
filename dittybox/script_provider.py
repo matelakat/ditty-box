@@ -19,28 +19,6 @@ class SetupScriptProvider(object):
         pass
 
 
-class Filesystem(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def contents_of(self, path):
-        pass
-
-
-class FakeFilesystem(Filesystem):
-    def __init__(self):
-        self.content_by_path = {}
-
-    def contents_of(self, path):
-        return self.content_by_path[path]
-
-
-class LocalFilesystem(Filesystem):
-    def contents_of(self, path):
-        with open(path, 'rb') as stream:
-            return stream.read()
-
-
 class PlainFileProvider(SetupScriptProvider):
     def __init__(self, filesystem, setup_script_path, onetime_script_path):
         self.filesystem = filesystem
