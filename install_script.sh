@@ -125,7 +125,7 @@ LANG=C chroot /mnt/ubuntu /bin/bash -c \
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2wb6NF3vXcQdQz+zHVkQ4vsvlPzm9rQMPZcjnavn3VZPUu6tBcmvIYvj1PHVTIR+zqhvNPunC21WZ8h8ACQlTwzr8mD+rjJtYYmyVSMwJl2Nvr3L5jP/aKqGPvLm8YGsYTJG2vXOWPBlZx+/BX6evcTE/FZ7YruoLHy2A7EJ6SLmT2yVlrfsCwNwPv2UEGIDnR2SfmuUkqZ6TufHaSBGtC/LuBkdoTT9HOlICNitrnExiOGL70/16A1reO0z7Nx3OuegmZx3C6rZzuPr7/M4NjCmMHermCmKVaMJBJIV1W3hOFYGseYVXstyAhmVP0ecWLlQ7JIF+WJy7zJYgguQB matelakat@devserver
 EOF
 
-### Enable passwordless sudo
+### Enable sudo
 echo "$USERNAME ALL = (ALL) ALL" | tee "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
 chmod 0440 "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
 
