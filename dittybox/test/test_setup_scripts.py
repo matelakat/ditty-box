@@ -29,5 +29,5 @@ class TestPlainProvider(unittest.TestCase):
             fs, None, '/path/to/onetime/script')
 
         self.assertEquals(
-            'onetimescript', prov.generate_onetime_script().read())
+            'onetimescript', prov.generate_onetime_stream().read())
 

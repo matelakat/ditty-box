@@ -15,7 +15,7 @@ class SetupScriptProvider(object):
         pass
 
     @abc.abstractmethod
-    def generate_onetime_script(self):
+    def generate_onetime_stream(self):
         pass
 
 
@@ -64,7 +64,7 @@ class PlainFileProvider(SetupScriptProvider):
         end script
         '''))
 
-    def generate_onetime_script(self):
+    def generate_onetime_stream(self):
         return StringIO.StringIO(
             self.filesystem.contents_of(self.onetime_script_filename))
 
@@ -76,5 +76,5 @@ class FakeSetupScriptProvider(SetupScriptProvider):
     def generate_upstart_stream(self):
         return self.fake_upstart_script
 
-    def generate_onetime_script(self):
+    def generate_onetime_stream(self):
         return self.fake_onetime_script

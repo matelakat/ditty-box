@@ -196,7 +196,7 @@ class ShellController(Controller):
         self.executor.sudo("mkdir -p /mnt/ubuntu")
         self.executor.sudo("mount /dev/sdb1 /mnt/ubuntu")
         self.executor.put(
-            self.setup_script_provider.generate_onetime_script(),
+            self.setup_script_provider.generate_onetime_stream(),
             '/mnt/ubuntu/root/install.sh')
         self.executor.put(
             self.setup_script_provider.generate_upstart_stream(),
