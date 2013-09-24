@@ -75,7 +75,7 @@ server 2.hu.pool.ntp.org
 server 3.hu.pool.ntp.org
 EOF
 
-# Configure SSH
+# Secure SSH
 sed -ie 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /mnt/ubuntu/etc/ssh/sshd_config
 
 # Configure hostname
@@ -133,11 +133,6 @@ chmod 0440 "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
 tee -a /mnt/ubuntu/etc/ssh/sshd_config << EOF
 AllowUsers $USERNAME
 EOF
-
-## Setup service account
-LANG=C chroot /mnt/ubuntu /bin/bash -c \
-    "DEBIAN_FRONTEND=noninteractive \
-    adduser --system psrv"
 
 while mount | grep "/mnt/ubuntu";
 do

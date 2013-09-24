@@ -32,6 +32,7 @@ class FakeVM(hypervisor.VM):
         self._name = name
         self._powered_off = True
         self.fake = FakeVMMethods(fake_call_collector)
+        self.fake_snapshots = []
 
     @property
     def disks(self):
@@ -59,10 +60,10 @@ class FakeVM(hypervisor.VM):
 
     @property
     def snapshots(self):
-        raise NotImplementedError()
+        return self.fake_snapshots
 
     def create_snapshot(self, snapshot_name):
-        raise NotImplementedError()
+        self.fake_snapshots.append(snapshot_name)
 
     def revert_to_snapshot(self, snapshot_name):
         raise NotImplementedError()

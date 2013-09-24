@@ -44,3 +44,6 @@ class LocalFilesystem(Filesystem):
     def contents_of(self, path):
         with open(path, 'rb') as stream:
             return stream.read()
+
+    def stream_of(self, path):
+        return open(path, 'rb')

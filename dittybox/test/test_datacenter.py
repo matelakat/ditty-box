@@ -134,3 +134,34 @@ class VMInstallTest(unittest.TestCase):
                 self.dc.controller.unplug_disk,
                 (self.server.detach_disk, self.guest_disk, self.controller_vm),
             ], self.fake_calls)
+
+
+class TestTestCase(unittest.TestCase):
+    def test_controller_calls(self):
+        fake_calls = []
+        hv = fake_hypervisor.FakeHypervisor(fake_calls)
+        hypervisor.set_hypervisor(hv)
+        server = hypervisor.get_server('user', 'pass')
+        ctr = controller.FakeController('controller', fake_calls)
+
+        guest = server.fake.add_vm('vm1')
+        guest_disk, = guest.fake.add_disks('guest-disk')
+        controller_vm = server.fake.add_vm('controller')
+        controller_vm.fake.add_disks('ctrl-disk')
+        controller_vm.power_on()
+
+        def sleep(time):
+            guest.power_off()
+
+        dc = datacenter.Datacenter(server, ctr, sleep=sleep)
+
+        dc._vm_test(controller_vm, guest, 'data_provider')
+
+        self.assertTrue(
+            ctr.mount_guest_disk in fake_calls)
+
+        self.assertTrue(
+            ctr.umount_guest_disk in fake_calls)
+
+        self.assertTrue(
+            (ctr.upload_data, 'data_provider') in fake_calls)

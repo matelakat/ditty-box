@@ -42,9 +42,10 @@ class Fail(Result):
 
 
 class Datacenter(object):
-    def __init__(self, hypervisor, controller):
+    def __init__(self, hypervisor, controller, sleep=None):
         self.hypervisor = hypervisor
         self.controller = controller
+        self.sleep = sleep or time.sleep
 
     def list_vms(self):
         result = []
@@ -138,7 +139,7 @@ class Datacenter(object):
             return validation_result
         return self._install_vm(*validation_result.data)
 
-    def _vm_test(self, vm_controller, vm_to_test):
+    def _vm_test(self, vm_controller, vm_to_test, data_provider):
         if not vm_to_test.powered_off:
             vm_to_test.power_off()
 
@@ -153,13 +154,16 @@ class Datacenter(object):
 
         self.hypervisor.attach_disk(guest_disk, vm_controller)
         self.controller.plug_disk()
+        self.controller.mount_guest_disk()
         self.controller.inject_onetime_script()
+        self.controller.upload_data(data_provider)
+        self.controller.umount_guest_disk()
         self.controller.unplug_disk()
         self.hypervisor.detach_disk(guest_disk, vm_controller)
         vm_to_test.power_on()
 
         while not vm_to_test.powered_off:
-            time.sleep(1)
+            self.sleep(1)
 
         self.hypervisor.attach_disk(guest_disk, vm_controller)
         self.controller.plug_disk()
@@ -183,10 +187,10 @@ class Datacenter(object):
 
         return Success(message)
 
-    def vm_test(self, vm_name):
+    def vm_test(self, vm_name, data_provider):
         validation_result = self._validate_install_vm(vm_name)
         if validation_result.failed:
             return validation_result
 
         vm_controller, vm_to_test, _ignored = validation_result.data
-        return self._vm_test(vm_controller, vm_to_test)
+        return self._vm_test(vm_controller, vm_to_test, data_provider)

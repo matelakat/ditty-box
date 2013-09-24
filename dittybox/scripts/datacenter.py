@@ -9,6 +9,7 @@ from dittybox import datacenter
 from dittybox import controller
 from dittybox import script_provider
 from dittybox import filesystem
+from dittybox import data_provider
 
 
 class DatacenterCommands(cmd.Cmd):
@@ -74,7 +75,12 @@ class DatacenterCommands(cmd.Cmd):
         print self.dc.controller.setup_script_provider.generate_setup_script()
 
     def do_vm_test(self, args):
-        result = self.dc.vm_test(args)
+        result = self.dc.vm_test(
+            args,
+            data_provider.SimpleDataProvider(
+                filesystem.LocalFilesystem(),
+                self._config.data_provider.data_file)
+            )
 
         if result.failed:
             print "FAIL", result.data
@@ -91,6 +97,7 @@ def main():
         cfg = config.Configuration(cfgfile)
 
     cmd_ = DatacenterCommands()
+    cmd_._config = cfg
     cmd_.prompt = "datacenter [%s] >" % args.config
 
     hypervisor_driver = importlib.import_module(cfg.hypervisor.driver)

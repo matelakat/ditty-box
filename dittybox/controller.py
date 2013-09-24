@@ -41,6 +41,14 @@ class Controller(object):
     def upload_data(self, data_provider):
         pass
 
+    @abc.abstractmethod
+    def mount_guest_disk(self):
+        pass
+
+    @abc.abstractmethod
+    def umount_guest_disk(self):
+        pass
+
 
 class Executor(object):
     __metaclass__ = abc.ABCMeta
@@ -197,23 +205,21 @@ class ShellController(Controller):
     def run_script(self, script):
         return self.executor.sudo_script(script)
 
-    def _mount_guest_disk(self):
+    def mount_guest_disk(self):
         self.executor.sudo("mkdir -p /mnt/ubuntu")
         self.executor.sudo("mount /dev/sdb1 /mnt/ubuntu")
 
-    def _unmount_guest_disk(self):
+    def umount_guest_disk(self):
         while not self.executor.sudo("umount /dev/sdb1"):
             self.executor.wait()
 
     def inject_onetime_script(self):
-        self._mount_guest_disk()
         self.executor.put(
             self.setup_script_provider.generate_onetime_stream(),
             '/mnt/ubuntu/root/install.sh')
         self.executor.put(
             self.setup_script_provider.generate_upstart_stream(),
             '/mnt/ubuntu/etc/init/install.conf')
-        self._unmount_guest_disk()
 
     def upload_data(self, data_provider):
         self.executor.sudo('mkdir -p /datacenter_data')
@@ -250,10 +256,17 @@ class FakeController(Controller):
         raise NotImplementedError()
 
     def run_script(self, script):
-        raise NotImplementedError()
+        self.fake_call_collector.append(self.run_script)
+        return ScriptResult('run_script/out', 'run_script/err', '0')
 
     def inject_onetime_script(self):
-        raise NotImplementedError()
+        self.fake_call_collector.append(self.inject_onetime_script)
 
     def upload_data(self, data_provider):
-        raise NotImplementedError()
+        self.fake_call_collector.append((self.upload_data, data_provider))
+
+    def mount_guest_disk(self):
+        self.fake_call_collector.append(self.mount_guest_disk)
+
+    def umount_guest_disk(self):
+        self.fake_call_collector.append(self.umount_guest_disk)

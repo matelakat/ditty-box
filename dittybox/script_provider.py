@@ -36,7 +36,7 @@ class PlainFileProvider(SetupScriptProvider):
 
         script
             echo "install started" >> /root/install.log
-            /bin/bash /root/install.sh </dev/null >/root/install.stdout 2>/root/install.stderr
+            /bin/bash /root/install.sh </dev/null >/root/install.stdout 2>/root/install.stderr || true
             halt -p
             echo "install finished" >> /root/install.log
         end script
