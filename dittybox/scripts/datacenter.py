@@ -111,8 +111,8 @@ def main():
         executor,
         script_provider.PlainFileProvider(
             filesystem.LocalFilesystem(),
-            'install_script.sh',
-            'onetime.sh')
+            cfg.script_provider.install,
+            cfg.script_provider.test)
         )
 
     cmd_.dc = datacenter.Datacenter(hv, ctr)
