@@ -16,6 +16,10 @@ class DatacenterCommands(cmd.Cmd):
     def do_exit(self, arg):
         return True
 
+    def do_network_list(self, arg):
+        for network_name in self.dc.list_networks():
+            print network_name
+
     def do_vm_list(self, arg):
         for vm_name, pwr in self.dc.list_vms():
             print vm_name, pwr

@@ -47,6 +47,9 @@ class Datacenter(object):
         self.controller = controller
         self.sleep = sleep or time.sleep
 
+    def list_networks(self):
+        return list(self.hypervisor.networks)
+
     def list_vms(self):
         result = []
         for vm in self.hypervisor.vms:
