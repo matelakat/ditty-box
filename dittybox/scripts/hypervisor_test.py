@@ -16,15 +16,19 @@ def exercise_hypervisor(args):
 
     vm_list_with_new_vm = list(hv.vms)
 
-    if vm_list_with_new_vm == vm_list:
+    if len(vm_list_with_new_vm) != len(vm_list) + 1:
         print "No vm created. Current vms: %s" % vm_list_with_new_vm
         return 1
+
+    if args.interactive:
+        print "VM created, press Enter to remove it"
+        sys.stdin.readline()
 
     hv.delete_vm(vm)
 
     vm_list_after_vm_delete = list(hv.vms)
 
-    if vm_list_after_vm_delete != vm_list:
+    if len(vm_list_after_vm_delete) != len(vm_list):
         print "vm not removed created. Current vms: %s" % vm_list_after_vm_delete
         return 1
 
@@ -36,6 +40,7 @@ def main():
     parser.add_argument('driver', help='driver to use')
     parser.add_argument('ip', help='ip address of hypervisor')
     parser.add_argument('password', help='password for hypervisor')
+    parser.add_argument('--interactive', help='interactive run', action='store_true')
     args = parser.parse_args()
     result = exercise_hypervisor(args)
     sys.exit(result)

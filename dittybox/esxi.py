@@ -98,8 +98,8 @@ class ESXiServer(hypervisor.Server):
         task = VITask(ret, self.esxi_server)
 
         #Wait for the task to finish
-        status = task.wait_for_state([task.STATE_SUCCESS, task.STATE_ERROR])
-        if status == task.STATE_ERROR:
+        task.wait_for_state([task.STATE_SUCCESS, task.STATE_ERROR])
+        if task.get_state() == task.STATE_ERROR:
             raise VIException("Error removing vm:", task.get_error_message())
 
     def _create_vm_name(self):
@@ -225,8 +225,7 @@ class ESXiServer(hypervisor.Server):
         task.wait_for_state([task.STATE_SUCCESS, task.STATE_ERROR])
 
         if task.get_state() == task.STATE_ERROR:
-            raise Exception("Error creating vm: %s" %
-        task.get_error_message())
+            raise Exception("Error creating vm: %s" % task.get_error_message())
 
     def get_datastore_name(self, config_target):
         for d in config_target.Datastore:
