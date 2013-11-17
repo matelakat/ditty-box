@@ -134,8 +134,7 @@ class ESXiServer(hypervisor.Server):
 
         config_target = self._get_config_target(host, crprops)
         network_name = self._get_network_name(config_target)
-        datastore_name = self.get_datastore_name(config_target)
-        volume_name = "[%s]" % datastore_name
+        volume_name = "[%s]" % "datastore1"
 
         self._create_vm(
             volume_name=volume_name,
@@ -227,12 +226,6 @@ class ESXiServer(hypervisor.Server):
 
         if task.get_state() == task.STATE_ERROR:
             raise Exception("Error creating vm: %s" % task.get_error_message())
-
-    def get_datastore_name(self, config_target):
-        for d in config_target.Datastore:
-            if d.Datastore.Accessible:
-                ds = d.Datastore.Datastore
-                return d.Datastore.Name
 
     def _get_network_name(self, config_target):
         for n in config_target.Network:
