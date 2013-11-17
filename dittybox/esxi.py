@@ -199,7 +199,7 @@ class ESXiServer(hypervisor.Server):
         #add a NIC. the network Name must be set as the device name to create the NIC.
         nic_spec = config.new_deviceChange()
         nic_spec.set_element_operation("add")
-        nic_ctlr = VI.ns0.VirtualPCNet32_Def("nic_ctlr").pyclass()
+        nic_ctlr = VI.ns0.VirtualE1000_Def("nic_ctlr").pyclass()
         nic_backing = VI.ns0.VirtualEthernetCardNetworkBackingInfo_Def("nic_backing").pyclass()
         nic_backing.set_element_deviceName(network_name)
         nic_ctlr.set_element_addressType("generated")
