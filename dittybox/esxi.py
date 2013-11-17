@@ -143,11 +143,7 @@ class ESXiServer(hypervisor.Server):
             resource_pool=resource_pool,
             host=host)
 
-        for vm in self.vms:
-            if vm.name == vm_name:
-                return vm
-
-        assert False
+        return ESXiVM(vm_name, self.esxi_server)
 
     def _create_vm(self, volume_name, vm_name, vm_description, mem_megs,
         cpu_count, guest_os_id, disk_size, network_name, vm_folder, resource_pool, host):
