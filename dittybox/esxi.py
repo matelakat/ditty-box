@@ -118,8 +118,7 @@ class ESXiServer(hypervisor.Server):
         datacenter = self._get_datacenter()
         compute_resources = self._get_compute_resurces(datacenter)
         host = self._get_host()
-        hostname = "ha-host"
-        crprops = self._get_compute_properties(compute_resources, hostname)
+        crprops = self._get_compute_properties(compute_resources, host)
         config_target = self._get_config_target(host, crprops)
         for n in config_target.Network:
             yield n.Network.Name
@@ -137,9 +136,8 @@ class ESXiServer(hypervisor.Server):
         datacenter = self._get_datacenter()
         datacenter_properties = self._get_datacenter_properties(datacenter)
         compute_resources = self._get_compute_resurces(datacenter)
-        host = self._get_host()
-        hostname = "ha-host"
-        crprops = self._get_compute_properties(compute_resources, hostname)
+        host  = self._get_host()
+        crprops = self._get_compute_properties(compute_resources, host)
         resource_pool = crprops.resourcePool._obj
         vm_folder = datacenter_properties.vmFolder._obj
 
@@ -245,9 +243,18 @@ class ESXiServer(hypervisor.Server):
         return VIProperty(self.esxi_server, datacenter)
 
     def _get_host(self):
+        mor_found = None
         for mor, name in self.esxi_server.get_hosts().items():
-            if name == 'localhost.localdomain':
-                return mor
+            if mor_found is None:
+                mor_found = mor
+            else:
+                raise Exception("multiple hosts not supported")
+
+        if mor_found is None:
+            raise Exception("no host found")
+
+        return mor_found
+
 
     def _get_config_target(self, host, compute_properties):
         request = VI.QueryConfigTargetRequestMsg()
