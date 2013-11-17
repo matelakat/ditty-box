@@ -204,7 +204,7 @@ class ESXiServer(hypervisor.Server):
         nic_backing.set_element_deviceName(network_name)
         nic_ctlr.set_element_addressType("generated")
         nic_ctlr.set_element_backing(nic_backing)
-        nic_ctlr.set_element_key(4)
+        nic_ctlr.set_element_key(1)
         nic_spec.set_element_device(nic_ctlr)
         devices.append(nic_spec)
 
