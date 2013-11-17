@@ -24,6 +24,10 @@ class DatacenterCommands(cmd.Cmd):
         for vm_name, pwr in self.dc.list_vms():
             print vm_name, pwr
 
+    def do_vm_delete(self, arg):
+        vm_name = arg
+        self.dc.vm_delete(arg)
+
     def do_vm_create(self, arg):
         params = self._create_create_vm_args(arg)
         if not params:

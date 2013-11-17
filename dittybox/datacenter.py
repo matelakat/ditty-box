@@ -47,6 +47,11 @@ class Datacenter(object):
         self.controller = controller
         self.sleep = sleep or time.sleep
 
+    def vm_delete(self, vm_name):
+        for vm in self.hypervisor.vms:
+            if vm.name == vm_name:
+                self.hypervisor.delete_vm(vm)
+
     def vm_create(self, mem_megs, disk_megs, network):
         vm = self.hypervisor.create_vm(mem_megs, disk_megs, network)
         return vm.name
