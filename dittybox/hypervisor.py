@@ -14,6 +14,10 @@ class Server(object):
     def disconnect(self):
         pass
 
+    @abc.abstractmethod
+    def create_vm(self, mem_megs, disk_megs):
+        pass
+
     def vm_by_name(self, name):
         for vm in self.vms:
             if vm.name == name:

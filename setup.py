@@ -13,6 +13,7 @@ setup(
             'esxi-toggle-disk = dittybox.scripts.esxi:toggle_disk',
             'datacenter = dittybox.scripts.datacenter:main',
             'remote-sudo = dittybox.scripts.remote_shell:sudo',
+            'test-hypervisor = dittybox.scripts.hypervisor_test:main',
         ]
     }
 )

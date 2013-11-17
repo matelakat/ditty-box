@@ -12,6 +12,14 @@ Useful utilities for system administration
  - List vms: `esxi-list-vms`
  - Toggle disk: `esxi-toggle-disk`
 
+## Developing with ESXi
+
+In order to be able to create the esxi driver, you will need a virtualbox
+running esxi. You can run the tests by executing:
+
+    test-hypervisor
+
+
 ## Other
 
 Unplug disk from ESXi guest:
