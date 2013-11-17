@@ -100,7 +100,7 @@ class ESXiServer(hypervisor.Server):
         #Wait for the task to finish
         task.wait_for_state([task.STATE_SUCCESS, task.STATE_ERROR])
         if task.get_state() == task.STATE_ERROR:
-            raise VIException("Error removing vm:", task.get_error_message())
+            raise Exception("Error removing vm:", task.get_error_message())
 
     def _create_vm_name(self):
         vm_names = [vm.name for vm in self.vms]
