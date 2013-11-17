@@ -47,6 +47,10 @@ class Datacenter(object):
         self.controller = controller
         self.sleep = sleep or time.sleep
 
+    def vm_create(self, mem_megs, disk_megs, network):
+        vm = self.hypervisor.create_vm(mem_megs, disk_megs, network)
+        return vm.name
+
     def list_networks(self):
         return list(self.hypervisor.networks)
 

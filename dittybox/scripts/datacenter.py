@@ -24,6 +24,14 @@ class DatacenterCommands(cmd.Cmd):
         for vm_name, pwr in self.dc.list_vms():
             print vm_name, pwr
 
+    def do_vm_create(self, arg):
+        params = self._create_create_vm_args(arg)
+        if not params:
+            return
+        mem_megs, disk_megs, network = params
+        vm_name = self.dc.vm_create(mem_megs, disk_megs, network)
+        print vm_name
+
     def do_vm_start(self, arg):
         self.dc.vm_start(arg)
 
@@ -50,6 +58,15 @@ class DatacenterCommands(cmd.Cmd):
             print "Two arguments needed: vm_name snapshot_name"
             return None
         return tuple(arg.split())
+
+    def _create_create_vm_args(self, arg):
+        if len(arg.split(',')) != 3:
+            print "Three arguments needed: mem_megs, disk_megs, network"
+            return None
+
+        mem_megs, disk_megs, network = [a.strip() for a in arg.split(',')]
+        return (int(mem_megs), int(disk_megs), network)
+
 
     def do_vm_create_snapshot(self, arg):
         snapshot_args = self._create_snapshot_args(arg)
