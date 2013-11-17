@@ -87,7 +87,32 @@ class ESXiServer(hypervisor.Server):
             name = prop_set.PropSet[0].Val
             yield ESXiVM(name, self.esxi_server)
 
+    def delete_vm(self, vm):
+        #Invoke Destroy_Task
+        request = VI.Destroy_TaskRequestMsg()
+
+        _this = request.new__this(vm.esxi_vm._mor)
+        _this.set_attribute_type(vm.esxi_vm._mor.get_attribute_type())
+        request.set_element__this(_this)
+        ret = self.esxi_server._proxy.Destroy_Task(request)._returnval
+        task = VITask(ret, self.esxi_server)
+
+        #Wait for the task to finish
+        status = task.wait_for_state([task.STATE_SUCCESS, task.STATE_ERROR])
+        if status == task.STATE_ERROR:
+            raise VIException("Error removing vm:", task.get_error_message())
+
     def create_vm(self, mem_megs, disk_megs):
+        vm_names = [vm.name for vm in self.vms]
+
+        counter = 0
+
+        while True:
+            vm_name = 'vm-%s' % counter
+            if vm_name not in vm_names:
+                break
+            counter += 1
+
         datacenter = self._get_datacenter()
         datacenter_properties = self._get_datacenter_properties(datacenter)
         compute_resources = self._get_compute_resurces(datacenter)
@@ -104,8 +129,8 @@ class ESXiServer(hypervisor.Server):
 
         self._create_vm(
             volume_name=volume_name,
-            vm_name='vm',
-            vm_description='sample vm',
+            vm_name=vm_name,
+            vm_description=vm_name,
             mem_megs=mem_megs,
             cpu_count=1,
             guest_os_id="rhel6Guest",
@@ -114,6 +139,12 @@ class ESXiServer(hypervisor.Server):
             vm_folder=vm_folder,
             resource_pool=resource_pool,
             host=host)
+
+        for vm in self.vms:
+            if vm.name == vm_name:
+                return vm
+
+        assert False
 
     def _create_vm(self, volume_name, vm_name, vm_description, mem_megs,
         cpu_count, guest_os_id, disk_size, network_name, vm_folder, resource_pool, host):

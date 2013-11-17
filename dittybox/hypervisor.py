@@ -18,6 +18,10 @@ class Server(object):
     def create_vm(self, mem_megs, disk_megs):
         pass
 
+    @abc.abstractmethod
+    def delete_vm(self, vm):
+        pass
+
     def vm_by_name(self, name):
         for vm in self.vms:
             if vm.name == name:

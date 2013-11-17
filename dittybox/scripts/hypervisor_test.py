@@ -10,14 +10,22 @@ def exercise_hypervisor(args):
     hypervisor.set_hypervisor(hypervisor_driver)
     hv = hypervisor.get_server(args.ip, args.password)
 
-    vms = list(hv.vms)
+    vm_list = list(hv.vms)
 
-    hv.create_vm(128, 20)
+    vm = hv.create_vm(128, 20)
 
-    new_vms = list(hv.vms)
+    vm_list_with_new_vm = list(hv.vms)
 
-    if new_vms == vms:
-        print "No vm created. Current vms: %s" % new_vms
+    if vm_list_with_new_vm == vm_list:
+        print "No vm created. Current vms: %s" % vm_list_with_new_vm
+        return 1
+
+    hv.delete_vm(vm)
+
+    vm_list_after_vm_delete = list(hv.vms)
+
+    if vm_list_after_vm_delete != vm_list:
+        print "vm not removed created. Current vms: %s" % vm_list_after_vm_delete
         return 1
 
     return 0
