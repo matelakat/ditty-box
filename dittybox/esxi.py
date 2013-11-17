@@ -113,6 +113,13 @@ class ESXiServer(hypervisor.Server):
                 return vm_name
             counter += 1
 
+    def _get_guest_id(self):
+        """
+        http://www.vmware.com/support/developer/converter-sdk/
+        conv43_apireference/vim.vm.GuestOsDescriptor.GuestOsIdentifier.html
+        """
+        return "ubuntu64Guest"
+
     def create_vm(self, mem_megs, disk_megs):
         vm_name = self._create_vm_name()
 
@@ -136,7 +143,7 @@ class ESXiServer(hypervisor.Server):
             vm_description=vm_name,
             mem_megs=mem_megs,
             cpu_count=1,
-            guest_os_id="rhel6Guest",
+            guest_os_id=self._get_guest_id(),
             disk_size=disk_megs * 1024,
             network_name=network_name,
             vm_folder=vm_folder,
