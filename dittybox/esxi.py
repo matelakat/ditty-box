@@ -187,6 +187,7 @@ class ESXiServer(hypervisor.Server):
         disk_backing = VI.ns0.VirtualDiskFlatVer2BackingInfo_Def("disk_backing").pyclass()
         disk_backing.set_element_fileName(volume_name)
         disk_backing.set_element_diskMode("persistent")
+        disk_backing.set_element_thinProvisioned(True)
         disk_ctlr.set_element_key(0)
         disk_ctlr.set_element_controllerKey(disk_ctrl_key)
         disk_ctlr.set_element_unitNumber(0)
