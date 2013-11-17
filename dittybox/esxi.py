@@ -102,7 +102,7 @@ class ESXiServer(hypervisor.Server):
         if status == task.STATE_ERROR:
             raise VIException("Error removing vm:", task.get_error_message())
 
-    def create_vm(self, mem_megs, disk_megs):
+    def _create_vm_name(self):
         vm_names = [vm.name for vm in self.vms]
 
         counter = 0
@@ -110,8 +110,11 @@ class ESXiServer(hypervisor.Server):
         while True:
             vm_name = 'vm-%s' % counter
             if vm_name not in vm_names:
-                break
+                return vm_name
             counter += 1
+
+    def create_vm(self, mem_megs, disk_megs):
+        vm_name = self._create_vm_name()
 
         datacenter = self._get_datacenter()
         datacenter_properties = self._get_datacenter_properties(datacenter)
