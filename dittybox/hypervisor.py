@@ -15,7 +15,7 @@ class Server(object):
         pass
 
     @abc.abstractmethod
-    def create_vm(self, mem_megs, disk_megs):
+    def create_vm(self, mem_megs, disk_megs, network):
         pass
 
     @abc.abstractmethod
@@ -33,6 +33,10 @@ class Server(object):
 
     @abc.abstractmethod
     def attach_disk(self, disk, vm):
+        pass
+
+    @abc.abstractproperty
+    def networks(self):
         pass
 
 

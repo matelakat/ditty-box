@@ -113,6 +113,17 @@ class ESXiServer(hypervisor.Server):
                 return vm_name
             counter += 1
 
+    @property
+    def networks(self):
+        datacenter = self._get_datacenter()
+        compute_resources = self._get_compute_resurces(datacenter)
+        host = self._get_host()
+        hostname = "ha-host"
+        crprops = self._get_compute_properties(compute_resources, hostname)
+        config_target = self._get_config_target(host, crprops)
+        for n in config_target.Network:
+            yield n.Network.Name
+
     def _get_guest_id(self):
         """
         http://www.vmware.com/support/developer/converter-sdk/
@@ -120,7 +131,7 @@ class ESXiServer(hypervisor.Server):
         """
         return "ubuntu64Guest"
 
-    def create_vm(self, mem_megs, disk_megs):
+    def create_vm(self, mem_megs, disk_megs, network):
         vm_name = self._create_vm_name()
 
         datacenter = self._get_datacenter()
@@ -132,8 +143,6 @@ class ESXiServer(hypervisor.Server):
         resource_pool = crprops.resourcePool._obj
         vm_folder = datacenter_properties.vmFolder._obj
 
-        config_target = self._get_config_target(host, crprops)
-        network_name = self._get_network_name(config_target)
         volume_name = "[%s]" % "datastore1"
 
         self._create_vm(
@@ -144,7 +153,7 @@ class ESXiServer(hypervisor.Server):
             cpu_count=1,
             guest_os_id=self._get_guest_id(),
             disk_size=disk_megs * 1024,
-            network_name=network_name,
+            network_name=network,
             vm_folder=vm_folder,
             resource_pool=resource_pool,
             host=host)
@@ -226,11 +235,6 @@ class ESXiServer(hypervisor.Server):
 
         if task.get_state() == task.STATE_ERROR:
             raise Exception("Error creating vm: %s" % task.get_error_message())
-
-    def _get_network_name(self, config_target):
-        for n in config_target.Network:
-            if n.Network.Accessible:
-                    return n.Network.Name
 
     def _get_datacenter(self):
         datacentername = "ha-datacenter"

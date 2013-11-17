@@ -112,6 +112,10 @@ class FakeServer(hypervisor.Server):
     def delete_vm(self, vm):
         raise NotImplementedError()
 
+    @property
+    def networks(self):
+        raise NotImplementedError()
+
 
 class FakeHypervisor(object):
     def __init__(self, fake_call_collector=None):
