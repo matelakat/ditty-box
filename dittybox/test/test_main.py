@@ -49,4 +49,43 @@ class TestMain(unittest.TestCase):
             """)
         }
 
-        result = main.create_cmd_interface('config_file', fs)
+        cmd = main.create_cmd_interface('config_file', fs)
+
+        self.assertEquals(
+            'datacenter [config_file] >', cmd.prompt)
+
+        self.assertEquals(
+            'dittybox.esxi', cmd.dc.hypervisor.__class__.__module__)
+
+        self.assertEquals(
+            'hypervisor_ip', cmd.dc.hypervisor.host)
+
+        self.assertEquals(
+            'hypervisor_pass', cmd.dc.hypervisor.password)
+
+        self.assertEquals(
+            'controller_vm_name', cmd.dc.controller.vm_name)
+
+        self.assertEquals(
+            'controller_vm_ip', cmd.dc.controller.executor.host)
+
+        self.assertEquals(
+            'controller_vm_pass', cmd.dc.controller.executor.password)
+
+        self.assertEquals(
+            'controller_vm_ssh_config',
+            cmd.dc.controller.executor.ssh_config)
+
+        # TODO - this is ugly
+        self.assertEquals(
+            'data_file_path',
+            cmd._config.data_provider.data_file)
+
+        self.assertEquals(
+            'install_script_path',
+            cmd.dc.controller.install_script_provider.setup_script_path)
+
+        # TODO - bad names are used here
+        self.assertEquals(
+            'test_script_path',
+            cmd.dc.controller.setup_script_provider.onetime_script_path)
