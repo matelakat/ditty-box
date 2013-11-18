@@ -12,12 +12,12 @@ class TestShellController(unittest.TestCase):
         self.maxDiff = None
 
     def test_vm_name(self):
-        ctrl = controller.ShellController('vmname', None, None)
+        ctrl = controller.ShellController('vmname', None, None, None)
         self.assertEquals('vmname', ctrl.vm_name)
 
     def test_unplug_disk(self):
         fake_exec = controller.FakeExecutor()
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
 
         ctrl.unplug_disk()
 
@@ -27,7 +27,7 @@ class TestShellController(unittest.TestCase):
 
     def test_plug_disk(self):
         fake_exec = controller.FakeExecutor()
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
 
         ctrl.plug_disk()
 
@@ -40,7 +40,7 @@ class TestShellController(unittest.TestCase):
         install_script_provider = script_provider.FakeInstallScriptProvider()
         install_script_provider.fake_setup_script = 'script'
         ctrl = controller.ShellController(
-            'vm', fake_exec, install_script_provider)
+            'vm', fake_exec, None, install_script_provider)
 
         ctrl.install_to_disk()
 
@@ -51,7 +51,7 @@ class TestShellController(unittest.TestCase):
     def test_mount_guest_disk_success(self):
         fake_exec = controller.FakeExecutor()
 
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
         ctrl.mount_guest_disk()
 
         self.assertEquals([
@@ -63,7 +63,7 @@ class TestShellController(unittest.TestCase):
     def test_umount_guest_disk_success(self):
         fake_exec = controller.FakeExecutor()
 
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
         ctrl.umount_guest_disk()
 
         self.assertEquals([
@@ -75,7 +75,7 @@ class TestShellController(unittest.TestCase):
         fake_exec = controller.FakeExecutor()
         fake_exec.fake_sudo_failures = [(fake_exec.sudo, 'umount /dev/sdb1')] * 2
 
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
         ctrl.umount_guest_disk()
 
         self.assertEquals([
@@ -93,7 +93,7 @@ class TestShellController(unittest.TestCase):
         setup_script_provider.fake_upstart_script = 'upstart_script'
         setup_script_provider.fake_onetime_script = 'somescript'
 
-        ctrl = controller.ShellController('vm', fake_exec, setup_script_provider)
+        ctrl = controller.ShellController('vm', fake_exec, setup_script_provider, None)
         ctrl.inject_onetime_script()
 
         self.assertEquals([
@@ -110,7 +110,7 @@ class TestShellController(unittest.TestCase):
         dp.fake_md5sum = 'md5sum'
         dp.fake_stream = FakeStream()
 
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
 
         ctrl.upload_data(dp)
 
@@ -129,7 +129,7 @@ class TestShellController(unittest.TestCase):
         dp = data_provider.FakeDataProvider()
         dp.fake_md5sum = 'md5sum'
 
-        ctrl = controller.ShellController('vm', fake_exec, None)
+        ctrl = controller.ShellController('vm', fake_exec, None, None)
 
         ctrl.upload_data(dp)
 
