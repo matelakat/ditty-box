@@ -74,8 +74,18 @@ class ESXiVM(hypervisor.VM):
 
 
 class ESXiServer(hypervisor.Server):
-    def __init__(self, esxi_server):
-        self.esxi_server = esxi_server
+    def __init__(self, host, username, password):
+        self.host = host
+        self.username = username
+        self.password = password
+        self._server = None
+
+    @property
+    def esxi_server(self):
+        if self._server is None:
+            self._server = VIServer()
+            self._server.connect(self.host, "root", self.password)
+        return self._server
 
     @property
     def vms(self):
@@ -385,6 +395,4 @@ def reconfig_request(esxi_vm):
 
 
 def get_server(host, password):
-    server = VIServer()
-    server.connect(host, "root", password)
-    return ESXiServer(server)
+    return ESXiServer(host, "root", password)
