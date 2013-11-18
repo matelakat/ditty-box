@@ -37,10 +37,10 @@ class TestShellController(unittest.TestCase):
 
     def test_debootstrap_to_disk(self):
         fake_exec = controller.FakeExecutor()
-        setup_script_provider = script_provider.FakeSetupScriptProvider()
-        setup_script_provider.fake_setup_script = 'script'
+        install_script_provider = script_provider.FakeInstallScriptProvider()
+        install_script_provider.fake_setup_script = 'script'
         ctrl = controller.ShellController(
-            'vm', fake_exec, setup_script_provider)
+            'vm', fake_exec, install_script_provider)
 
         ctrl.install_to_disk()
 

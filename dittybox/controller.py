@@ -179,10 +179,12 @@ class SSHExecutor(Executor):
 
 
 class ShellController(Controller):
-    def __init__(self, vm_name, executor, setup_script_provider):
+    def __init__(self, vm_name, executor, setup_script_provider,
+                 install_script_provider):
         self.executor = executor
         self._vm_name = vm_name
         self.setup_script_provider = setup_script_provider
+        self.install_script_provider = install_script_provider
 
     def unplug_disk(self):
         self.executor.sudo('echo "1" > /sys/block/sdb/device/delete')
@@ -192,7 +194,7 @@ class ShellController(Controller):
 
     def install_to_disk(self):
         return self.executor.sudo_script(
-            self.setup_script_provider.generate_setup_script())
+            self.install_script_provider.generate_setup_script())
 
     @property
     def vm_name(self):

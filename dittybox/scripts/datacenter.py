@@ -97,7 +97,7 @@ class DatacenterCommands(cmd.Cmd):
         self.dc.controller.check()
 
     def do_show_install_script(self, arg):
-        print self.dc.controller.setup_script_provider.generate_setup_script()
+        print self.dc.controller.install_script_provider.generate_setup_script()
 
     def do_vm_test(self, args):
         result = self.dc.vm_test(
@@ -136,8 +136,10 @@ def main():
         executor,
         script_provider.PlainFileProvider(
             filesystem.LocalFilesystem(),
-            cfg.script_provider.install,
-            cfg.script_provider.test)
+            cfg.script_provider.test),
+        script_provider.PlainFileInstallScriptProvider(
+            filesystem.LocalFilesystem(),
+            cfg.script_provider.install),
         )
 
     cmd_.dc = datacenter.Datacenter(hv, ctr)

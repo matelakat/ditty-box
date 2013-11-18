@@ -3,13 +3,15 @@ import textwrap
 import StringIO
 
 
-class SetupScriptProvider(object):
+class InstallScriptProvider(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def generate_setup_script(self):
         pass
 
+
+class SetupScriptProvider(object):
     @abc.abstractmethod
     def generate_upstart_stream(self):
         pass
@@ -19,14 +21,20 @@ class SetupScriptProvider(object):
         pass
 
 
-class PlainFileProvider(SetupScriptProvider):
-    def __init__(self, filesystem, setup_script_path, onetime_script_path):
+class PlainFileInstallScriptProvider(InstallScriptProvider):
+
+    def __init__(self, filesystem, setup_script_path):
         self.filesystem = filesystem
         self.setup_script_path = setup_script_path
-        self.onetime_script_path = onetime_script_path
 
     def generate_setup_script(self):
         return self.filesystem.contents_of(self.setup_script_path)
+
+
+class PlainFileProvider(SetupScriptProvider):
+    def __init__(self, filesystem, onetime_script_path):
+        self.filesystem = filesystem
+        self.onetime_script_path = onetime_script_path
 
     def generate_upstart_stream(self):
         return StringIO.StringIO(textwrap.dedent('''
@@ -47,10 +55,12 @@ class PlainFileProvider(SetupScriptProvider):
             self.filesystem.contents_of(self.onetime_script_path))
 
 
-class FakeSetupScriptProvider(SetupScriptProvider):
+class FakeInstallScriptProvider(InstallScriptProvider):
     def generate_setup_script(self):
         return self.fake_setup_script
 
+
+class FakeSetupScriptProvider(SetupScriptProvider):
     def generate_upstart_stream(self):
         return self.fake_upstart_script
 
