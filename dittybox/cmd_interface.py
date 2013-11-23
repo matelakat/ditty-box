@@ -91,9 +91,7 @@ class DatacenterCommands(cmd.Cmd):
     def do_vm_test(self, args):
         result = self.dc.vm_test(
             args,
-            data_provider.SimpleDataProvider(
-                filesystem.LocalFilesystem(),
-                self._config.data_provider.data_file)
+            self.data_provider,
             )
 
         if result.failed:

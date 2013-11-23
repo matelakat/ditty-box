@@ -7,6 +7,7 @@ from dittybox import controller
 from dittybox import script_provider
 from dittybox import datacenter
 from dittybox import cmd_interface
+from dittybox import data_provider
 
 
 class ConfigException(Exception):
@@ -40,6 +41,9 @@ def create_cmd_interface(config_file_path, filesystem):
                 filesystem,
                 cfg.script_provider.install),
             )
+
+        cmd.data_provider = data_provider.SimpleDataProvider(
+            filesystem, cfg.data_provider.data_file)
 
         cmd.dc = datacenter.Datacenter(hv, ctr)
 

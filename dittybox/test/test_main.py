@@ -76,10 +76,9 @@ class TestMain(unittest.TestCase):
             'controller_vm_ssh_config',
             cmd.dc.controller.executor.ssh_config)
 
-        # TODO - this is ugly
         self.assertEquals(
             'data_file_path',
-            cmd._config.data_provider.data_file)
+            cmd.data_provider.data_path)
 
         self.assertEquals(
             'install_script_path',
