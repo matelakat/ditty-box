@@ -32,9 +32,9 @@ class PlainFileInstallScriptProvider(InstallScriptProvider):
 
 
 class PlainFileProvider(SetupScriptProvider):
-    def __init__(self, filesystem, onetime_script_path):
+    def __init__(self, filesystem, script_path):
         self.filesystem = filesystem
-        self.onetime_script_path = onetime_script_path
+        self.script_path = script_path
 
     def generate_upstart_stream(self):
         return StringIO.StringIO(textwrap.dedent('''
@@ -52,7 +52,7 @@ class PlainFileProvider(SetupScriptProvider):
 
     def generate_onetime_stream(self):
         return StringIO.StringIO(
-            self.filesystem.contents_of(self.onetime_script_path))
+            self.filesystem.contents_of(self.script_path))
 
 
 class FakeInstallScriptProvider(InstallScriptProvider):
