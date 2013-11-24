@@ -42,7 +42,7 @@ class TestShellController(unittest.TestCase):
         ctrl = controller.ShellController(
             'vm', fake_exec, None, install_script_provider)
 
-        ctrl.install_to_disk()
+        ctrl.install_to_disk('vm_name')
 
         self.assertEquals([
             (fake_exec.sudo_script, 'script')
