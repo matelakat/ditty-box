@@ -42,10 +42,10 @@ class TestShellController(unittest.TestCase):
         ctrl = controller.ShellController(
             'vm', fake_exec, None, install_script_provider)
 
-        ctrl.install_to_disk('vm_name')
+        ctrl.install_to_disk(dict(vm_name='vm1'))
 
         self.assertEquals([
-            (fake_exec.sudo_script, 'script')
+            (fake_exec.sudo_script, 'script:vm_name=vm1')
             ], fake_exec.fake_calls)
 
     def test_mount_guest_disk_success(self):
