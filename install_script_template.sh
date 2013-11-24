@@ -1,7 +1,7 @@
 set -eux
 
 BDEVICE=/dev/sdb
-HNAME="guestmachine"
+HNAME="@vm_name@"
 USERNAME="matelakat"
 PASSWORD="somepass"
 
