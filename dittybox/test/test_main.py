@@ -45,7 +45,9 @@ class TestMain(unittest.TestCase):
 
             [script_providers]
             install = install_script_path
-            user_script = user_script_path
+
+            [user_script_provider]
+            script_path = user_script_path
 
             [name_generator]
             prefix = vm-
