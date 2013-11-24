@@ -45,7 +45,7 @@ class TestMain(unittest.TestCase):
 
             [script_providers]
             install = install_script_path
-            user_script = test_script_path
+            user_script = user_script_path
             """)
         }
 
@@ -86,5 +86,5 @@ class TestMain(unittest.TestCase):
 
         # TODO - bad names are used here
         self.assertEquals(
-            'test_script_path',
+            'user_script_path',
             cmd.dc.controller.user_script_provider.script_path)
