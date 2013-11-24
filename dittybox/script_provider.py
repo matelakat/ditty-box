@@ -34,6 +34,19 @@ class PlainFileInstallScriptProvider(InstallScriptProvider):
         return self.filesystem.contents_of(self.setup_script_path)
 
 
+class TemplateBasedInstallScriptProvider(InstallScriptProvider):
+
+    def __init__(self, filesystem, script_path):
+        self.filesystem = filesystem
+        self.script_path = script_path
+
+    def _generate_install_script(self, params):
+        script = self.filesystem.contents_of(self.script_path)
+        for k, v in params.items():
+            script = script.replace('@%s@' % k, v)
+        return script
+
+
 class PlainFileProvider(SetupScriptProvider):
     def __init__(self, filesystem, script_path):
         self.filesystem = filesystem

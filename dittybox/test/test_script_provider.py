@@ -34,3 +34,14 @@ class TestPlainProvider(unittest.TestCase):
         self.assertEquals(
             'onetimescript', prov.generate_onetime_stream().read())
 
+
+class TestTemplatedProvider(unittest.TestCase):
+    def test_generate_install_script(self):
+        fs = filesystem.FakeFilesystem()
+        fs.content_by_path['/path/to/install/script'] = 'script @vm_name@'
+
+        prov = script_provider.TemplateBasedInstallScriptProvider(
+            fs, '/path/to/install/script')
+
+        self.assertEquals(
+            'script vm-1', prov.generate_install_script(dict(vm_name='vm-1')))
