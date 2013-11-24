@@ -6,8 +6,11 @@ import StringIO
 class InstallScriptProvider(object):
     __metaclass__ = abc.ABCMeta
 
+    def generate_install_script(self, params):
+        return self._generate_install_script(params)
+
     @abc.abstractmethod
-    def generate_install_script(self):
+    def _generate_install_script(self, params):
         pass
 
 
@@ -27,7 +30,7 @@ class PlainFileInstallScriptProvider(InstallScriptProvider):
         self.filesystem = filesystem
         self.setup_script_path = setup_script_path
 
-    def generate_install_script(self, vm_name):
+    def _generate_install_script(self, vm_name):
         return self.filesystem.contents_of(self.setup_script_path)
 
 
@@ -56,7 +59,7 @@ class PlainFileProvider(SetupScriptProvider):
 
 
 class FakeInstallScriptProvider(InstallScriptProvider):
-    def generate_install_script(self, params):
+    def _generate_install_script(self, params):
         params = ','.join(sorted(['='.join(item) for item in params.items()]))
         return ':'.join([self.fake_setup_script, params])
 
