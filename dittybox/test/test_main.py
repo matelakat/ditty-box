@@ -84,7 +84,6 @@ class TestMain(unittest.TestCase):
             'install_script_path',
             cmd.dc.controller.install_script_provider.setup_script_path)
 
-        # TODO - bad names are used here
         self.assertEquals(
             'user_script_path',
             cmd.dc.controller.user_script_provider.script_path)
