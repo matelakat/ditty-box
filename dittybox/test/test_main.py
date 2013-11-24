@@ -44,7 +44,7 @@ class TestMain(unittest.TestCase):
             data_file = data_file_path
 
             [install_script_provider]
-            install = install_script_path
+            script_path = install_script_path
 
             [user_script_provider]
             script_path = user_script_path
