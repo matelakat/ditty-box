@@ -100,4 +100,9 @@ class DatacenterCommands(cmd.Cmd):
             print "SUCCESS", result.data
 
 
-
+def create(config_file_path, data_provider, datacenter):
+    cmd = DatacenterCommands()
+    cmd.prompt = "datacenter [%s] >" % config_file_path
+    cmd.data_provider = data_provider
+    cmd.dc = datacenter
+    return cmd

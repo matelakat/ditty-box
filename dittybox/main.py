@@ -39,12 +39,12 @@ def create_cmd_interface(config_file_path, filesystem):
                 cfg.script_providers.install),
             )
 
-        cmd = cmd_interface.DatacenterCommands()
-        cmd.prompt = "datacenter [%s] >" % config_file_path
-        cmd.data_provider = data_provider.SimpleDataProvider(
-            filesystem, cfg.data_provider.data_file)
-
-        cmd.dc = datacenter.Datacenter(hv, ctr)
+        cmd = cmd_interface.create(
+            config_file_path,
+            data_provider.SimpleDataProvider(
+                filesystem, cfg.data_provider.data_file),
+            datacenter.Datacenter(hv, ctr),
+            )
 
         return cmd
 
