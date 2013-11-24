@@ -46,6 +46,11 @@ class TestMain(unittest.TestCase):
             [script_providers]
             install = install_script_path
             user_script = user_script_path
+
+            [name_generator]
+            prefix = vm-
+            first_id = 10
+            last_id = 12
             """)
         }
 
@@ -87,3 +92,15 @@ class TestMain(unittest.TestCase):
         self.assertEquals(
             'user_script_path',
             cmd.dc.controller.user_script_provider.script_path)
+
+        self.assertEquals(
+            'vm-',
+            cmd.dc.name_generator.prefix)
+
+        self.assertEquals(
+            10,
+            cmd.dc.name_generator.first_id)
+
+        self.assertEquals(
+            12,
+            cmd.dc.name_generator.last_id)

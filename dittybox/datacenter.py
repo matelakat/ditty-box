@@ -42,9 +42,10 @@ class Fail(Result):
 
 
 class Datacenter(object):
-    def __init__(self, hypervisor, controller, sleep=None):
+    def __init__(self, hypervisor, controller, name_generator, sleep=None):
         self.hypervisor = hypervisor
         self.controller = controller
+        self.name_generator = name_generator
         self.sleep = sleep or time.sleep
 
     def vm_delete(self, vm_name):
@@ -53,7 +54,9 @@ class Datacenter(object):
                 self.hypervisor.delete_vm(vm)
 
     def vm_create(self, mem_megs, disk_megs, network):
-        vm = self.hypervisor.create_vm(mem_megs, disk_megs, network)
+        vm_names = [vm.name for vm in self.hypervisor.vms]
+        vm_name = self.name_generator.new_name(vm_names)
+        vm = self.hypervisor.create_vm(mem_megs, disk_megs, network, vm_name)
         return vm.name
 
     def list_networks(self):

@@ -20,7 +20,7 @@ def exercise_hypervisor(args):
 
     vm_list = list(hv.vms)
 
-    vm = hv.create_vm(128, 20, network)
+    vm = hv.create_vm(128, 20, network, 'test_vm')
 
     vm_list_with_new_vm = list(hv.vms)
 

@@ -106,8 +106,8 @@ class FakeServer(hypervisor.Server):
     def disconnect(self):
         raise NotImplementedError()
 
-    def create_vm(self, mem_megs, disk_megs):
-        raise NotImplementedError()
+    def create_vm(self, mem_megs, disk_megs, network, vm_name):
+        return self.fake.add_vm(vm_name)
 
     def delete_vm(self, vm):
         raise NotImplementedError()

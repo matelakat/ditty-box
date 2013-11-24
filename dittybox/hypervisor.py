@@ -15,7 +15,7 @@ class Server(object):
         pass
 
     @abc.abstractmethod
-    def create_vm(self, mem_megs, disk_megs, network):
+    def create_vm(self, mem_megs, disk_megs, network, vm_name):
         pass
 
     @abc.abstractmethod

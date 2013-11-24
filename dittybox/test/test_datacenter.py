@@ -5,6 +5,7 @@ from dittybox import datacenter
 from dittybox import controller
 from dittybox import fake_hypervisor
 from dittybox import hypervisor
+from dittybox import vm_param_generator
 
 
 class VMListTest(unittest.TestCase):
@@ -12,7 +13,7 @@ class VMListTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
-        self.dc = datacenter.Datacenter(self.server, None)
+        self.dc = datacenter.Datacenter(self.server, None, None)
 
     def test_server_listing(self):
         vms = self.dc.list_vms()
@@ -39,7 +40,7 @@ class VMInstallValidationTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor()
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
-        self.dc = datacenter.Datacenter(self.server, None)
+        self.dc = datacenter.Datacenter(self.server, None, None)
         self.install_vm_result = object()
 
     def test_no_vm_found(self):
@@ -98,7 +99,7 @@ class VMInstallTest(unittest.TestCase):
         hv = fake_hypervisor.FakeHypervisor(self.fake_calls)
         hypervisor.set_hypervisor(hv)
         self.server = hypervisor.get_server('user', 'pass')
-        self.dc = datacenter.Datacenter(self.server, None)
+        self.dc = datacenter.Datacenter(self.server, None, None)
         self.dc.controller = controller.FakeController('controller', self.fake_calls)
         self.vm = self.server.fake.add_vm('vm1')
         self.guest_disk, = self.vm.fake.add_disks('guest-disk')
@@ -153,7 +154,7 @@ class TestTestCase(unittest.TestCase):
         def sleep(time):
             guest.power_off()
 
-        dc = datacenter.Datacenter(server, ctr, sleep=sleep)
+        dc = datacenter.Datacenter(server, ctr, None, sleep=sleep)
 
         dc._vm_test(controller_vm, guest, 'data_provider')
 
@@ -165,3 +166,18 @@ class TestTestCase(unittest.TestCase):
 
         self.assertTrue(
             (ctr.upload_data, 'data_provider') in fake_calls)
+
+
+class TestVMCreate(unittest.TestCase):
+    def test_create_vm(self):
+        hv = fake_hypervisor.FakeServer()
+        hv.fake.add_vm('vm1')
+
+        name_generator = vm_param_generator.FakeNameGenerator()
+        name_generator.fake_name = 'somevm'
+        dc = datacenter.Datacenter(hv, None, name_generator)
+
+        vm_name = dc.vm_create(128, 20000, 'some_net')
+
+        self.assertEquals('somevm', vm_name)
+        self.assertEquals([['vm1']], name_generator.vm_names)

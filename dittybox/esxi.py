@@ -112,17 +112,6 @@ class ESXiServer(hypervisor.Server):
         if task.get_state() == task.STATE_ERROR:
             raise Exception("Error removing vm:", task.get_error_message())
 
-    def _create_vm_name(self):
-        vm_names = [vm.name for vm in self.vms]
-
-        counter = 0
-
-        while True:
-            vm_name = 'vm-%s' % counter
-            if vm_name not in vm_names:
-                return vm_name
-            counter += 1
-
     @property
     def networks(self):
         datacenter = self._get_datacenter()
@@ -140,8 +129,7 @@ class ESXiServer(hypervisor.Server):
         """
         return "ubuntu64Guest"
 
-    def create_vm(self, mem_megs, disk_megs, network):
-        vm_name = self._create_vm_name()
+    def create_vm(self, mem_megs, disk_megs, network, vm_name):
 
         datacenter = self._get_datacenter()
         datacenter_properties = self._get_datacenter_properties(datacenter)

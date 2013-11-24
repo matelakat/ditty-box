@@ -8,6 +8,7 @@ from dittybox import script_provider
 from dittybox import datacenter
 from dittybox import cmd_interface
 from dittybox import data_provider
+from dittybox import vm_param_generator
 
 
 class ConfigException(Exception):
@@ -43,7 +44,13 @@ def create_cmd_interface(config_file_path, filesystem):
             config_file_path,
             data_provider.SimpleDataProvider(
                 filesystem, cfg.data_provider.data_file),
-            datacenter.Datacenter(hv, ctr),
+            datacenter.Datacenter(hv, ctr,
+                vm_param_generator.NameGenerator(
+                    cfg.name_generator.prefix,
+                    int(cfg.name_generator.first_id),
+                    int(cfg.name_generator.last_id),
+                    )
+                ),
             )
 
         return cmd
