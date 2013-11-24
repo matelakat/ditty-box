@@ -179,11 +179,11 @@ class SSHExecutor(Executor):
 
 
 class ShellController(Controller):
-    def __init__(self, vm_name, executor, setup_script_provider,
+    def __init__(self, vm_name, executor, user_script_provider,
                  install_script_provider):
         self.executor = executor
         self._vm_name = vm_name
-        self.setup_script_provider = setup_script_provider
+        self.user_script_provider = user_script_provider
         self.install_script_provider = install_script_provider
 
     def unplug_disk(self):
@@ -217,10 +217,10 @@ class ShellController(Controller):
 
     def inject_onetime_script(self):
         self.executor.put(
-            self.setup_script_provider.generate_onetime_stream(),
+            self.user_script_provider.generate_onetime_stream(),
             '/mnt/ubuntu/root/install.sh')
         self.executor.put(
-            self.setup_script_provider.generate_upstart_stream(),
+            self.user_script_provider.generate_upstart_stream(),
             '/mnt/ubuntu/etc/init/install.conf')
 
     def upload_data(self, data_provider):

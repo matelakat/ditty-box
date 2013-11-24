@@ -87,4 +87,4 @@ class TestMain(unittest.TestCase):
         # TODO - bad names are used here
         self.assertEquals(
             'test_script_path',
-            cmd.dc.controller.setup_script_provider.onetime_script_path)
+            cmd.dc.controller.user_script_provider.onetime_script_path)
