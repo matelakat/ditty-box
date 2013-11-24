@@ -115,7 +115,7 @@ class VMInstallTest(unittest.TestCase):
         self.assertEquals([
                 (self.server.attach_disk, self.guest_disk, self.controller_vm),
                 self.dc.controller.plug_disk,
-                (self.dc.controller.install_to_disk, self.vm.name),
+                (self.dc.controller.install_to_disk, dict(vm_name=self.vm.name)),
                 self.dc.controller.unplug_disk,
                 (self.server.detach_disk, self.guest_disk, self.controller_vm),
             ], self.fake_calls)
@@ -131,7 +131,7 @@ class VMInstallTest(unittest.TestCase):
                 self.vm.power_off,
                 (self.server.attach_disk, self.guest_disk, self.controller_vm),
                 self.dc.controller.plug_disk,
-                (self.dc.controller.install_to_disk, self.vm.name),
+                (self.dc.controller.install_to_disk, dict(vm_name=self.vm.name)),
                 self.dc.controller.unplug_disk,
                 (self.server.detach_disk, self.guest_disk, self.controller_vm),
             ], self.fake_calls)

@@ -140,7 +140,9 @@ class Datacenter(object):
 
         self.hypervisor.attach_disk(guest_disk, vm_controller)
         self.controller.plug_disk()
-        install_result = self.controller.install_to_disk(vm_to_install.name)
+        install_result = self.controller.install_to_disk(
+            dict(vm_name=vm_to_install.name)
+        )
         self.controller.unplug_disk()
         self.hypervisor.detach_disk(guest_disk, vm_controller)
 

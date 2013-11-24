@@ -192,9 +192,9 @@ class ShellController(Controller):
     def plug_disk(self):
         self.executor.sudo('echo "- - -" > /sys/class/scsi_host/host2/scan')
 
-    def install_to_disk(self, vm_name):
+    def install_to_disk(self, params):
         return self.executor.sudo_script(
-            self.install_script_provider.generate_install_script(vm_name))
+            self.install_script_provider.generate_install_script(params))
 
     @property
     def vm_name(self):
@@ -250,8 +250,8 @@ class FakeController(Controller):
     def unplug_disk(self):
         self.fake_call_collector.append(self.unplug_disk)
 
-    def install_to_disk(self, vm_name):
-        self.fake_call_collector.append((self.install_to_disk, vm_name))
+    def install_to_disk(self, params):
+        self.fake_call_collector.append((self.install_to_disk, params))
         return ScriptResult('out', 'err', '0')
 
     def check(self):
