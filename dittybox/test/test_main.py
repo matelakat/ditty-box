@@ -44,7 +44,7 @@ class TestMain(unittest.TestCase):
             data_file = data_file_path
 
             [install_script_provider]
-            cls = PlainFileInstallScriptProvider
+            cls = TemplateBasedInstallScriptProvider
             script_path = install_script_path
 
             [user_script_provider]
@@ -90,7 +90,7 @@ class TestMain(unittest.TestCase):
 
         self.assertEquals(
             'install_script_path',
-            cmd.dc.controller.install_script_provider.setup_script_path)
+            cmd.dc.controller.install_script_provider.script_path)
 
         self.assertEquals(
             'user_script_path',

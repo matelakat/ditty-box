@@ -26,12 +26,12 @@ class SetupScriptProvider(object):
 
 class PlainFileInstallScriptProvider(InstallScriptProvider):
 
-    def __init__(self, filesystem, setup_script_path):
+    def __init__(self, filesystem, script_path):
         self.filesystem = filesystem
-        self.setup_script_path = setup_script_path
+        self.script_path = script_path
 
     def _generate_install_script(self, params):
-        return self.filesystem.contents_of(self.setup_script_path)
+        return self.filesystem.contents_of(self.script_path)
 
 
 class TemplateBasedInstallScriptProvider(InstallScriptProvider):
