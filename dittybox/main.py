@@ -36,7 +36,7 @@ def create_cmd_interface(config_file_path, filesystem):
             executor,
             script_provider.PlainFileProvider(
                 filesystem,
-                cfg.script_provider.test),
+                cfg.script_provider.user_script),
             script_provider.PlainFileInstallScriptProvider(
                 filesystem,
                 cfg.script_provider.install),

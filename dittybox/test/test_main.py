@@ -45,7 +45,7 @@ class TestMain(unittest.TestCase):
 
             [script_provider]
             install = install_script_path
-            test = test_script_path
+            user_script = test_script_path
             """)
         }
 
