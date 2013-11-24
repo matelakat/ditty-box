@@ -13,7 +13,7 @@ class TestInstallScriptProvider(unittest.TestCase):
         prov = script_provider.PlainFileInstallScriptProvider(
             fs, '/path/to/setup/script')
 
-        self.assertEquals('setupscript', prov.generate_setup_script())
+        self.assertEquals('setupscript', prov.generate_install_script())
 
 
 class TestPlainProvider(unittest.TestCase):

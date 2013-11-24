@@ -7,7 +7,7 @@ class InstallScriptProvider(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def generate_setup_script(self):
+    def generate_install_script(self):
         pass
 
 
@@ -27,7 +27,7 @@ class PlainFileInstallScriptProvider(InstallScriptProvider):
         self.filesystem = filesystem
         self.setup_script_path = setup_script_path
 
-    def generate_setup_script(self):
+    def generate_install_script(self):
         return self.filesystem.contents_of(self.setup_script_path)
 
 
@@ -56,7 +56,7 @@ class PlainFileProvider(SetupScriptProvider):
 
 
 class FakeInstallScriptProvider(InstallScriptProvider):
-    def generate_setup_script(self):
+    def generate_install_script(self):
         return self.fake_setup_script
 
 

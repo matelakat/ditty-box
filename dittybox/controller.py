@@ -194,7 +194,7 @@ class ShellController(Controller):
 
     def install_to_disk(self):
         return self.executor.sudo_script(
-            self.install_script_provider.generate_setup_script())
+            self.install_script_provider.generate_install_script())
 
     @property
     def vm_name(self):
