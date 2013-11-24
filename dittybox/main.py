@@ -22,8 +22,6 @@ def create_cmd_interface(config_file_path, filesystem):
 
     try:
         cfg = config.Configuration(cfgfile)
-        cmd = cmd_interface.DatacenterCommands()
-        cmd.prompt = "datacenter [%s] >" % config_file_path
         hypervisor_driver = importlib.import_module(cfg.hypervisor.driver)
         hypervisor.set_hypervisor(hypervisor_driver)
 
@@ -41,6 +39,8 @@ def create_cmd_interface(config_file_path, filesystem):
                 cfg.script_providers.install),
             )
 
+        cmd = cmd_interface.DatacenterCommands()
+        cmd.prompt = "datacenter [%s] >" % config_file_path
         cmd.data_provider = data_provider.SimpleDataProvider(
             filesystem, cfg.data_provider.data_file)
 
