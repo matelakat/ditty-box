@@ -6,6 +6,10 @@ import StringIO
 class InstallScriptProvider(object):
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, filesystem, script_path):
+        self.filesystem = filesystem
+        self.script_path = script_path
+
     def generate_install_script(self, params):
         return self._generate_install_script(params)
 
@@ -26,19 +30,11 @@ class SetupScriptProvider(object):
 
 class PlainFileInstallScriptProvider(InstallScriptProvider):
 
-    def __init__(self, filesystem, script_path):
-        self.filesystem = filesystem
-        self.script_path = script_path
-
     def _generate_install_script(self, params):
         return self.filesystem.contents_of(self.script_path)
 
 
 class TemplateBasedInstallScriptProvider(InstallScriptProvider):
-
-    def __init__(self, filesystem, script_path):
-        self.filesystem = filesystem
-        self.script_path = script_path
 
     def _generate_install_script(self, params):
         script = self.filesystem.contents_of(self.script_path)
