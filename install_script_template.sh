@@ -42,7 +42,7 @@ mount "${BDEVICE}1" /mnt/ubuntu
 RUNLEVEL=1 debootstrap \
      --arch=amd64 \
      --components=main,universe \
-     --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc,wget,make,gcc,linux-libc-dev,libc6-dev,python-dev,libpcre3-dev,libpq-dev,postgresql,ntp,python-virtualenv,python-pip,python-pkg-resources,python-setuptools \
+     --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc,ntp \
      precise \
      /mnt/ubuntu \
      http://hu.archive.ubuntu.com/ubuntu/
@@ -84,6 +84,9 @@ echo "$HNAME" > /mnt/ubuntu/etc/hostname
 # Configure hosts file, so that hostname could be resolved
 sed -i "1 s/\$/ $HNAME/" /mnt/ubuntu/etc/hosts
 
+# Configure timezone
+echo "Europe/Budapest" > /mnt/ubuntu/etc/timezone
+
 # Configure fstab
 tee /mnt/ubuntu/etc/fstab << EOF
 proc /proc proc nodev,noexec,nosuid 0 0
@@ -101,6 +104,9 @@ LANG=C chroot /mnt/ubuntu /bin/bash -c \
 
 LANG=C chroot /mnt/ubuntu /bin/bash -c \
     "update-grub"
+
+LANG=C chroot /mnt/ubuntu /bin/bash -c \
+    "dpkg-reconfigure --frontend noninteractive tzdata"
 
 umount /mnt/ubuntu/sys
 umount /mnt/ubuntu/proc
