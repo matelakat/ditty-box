@@ -38,17 +38,22 @@ class TestShellController(unittest.TestCase):
 
     def test_debootstrap_to_disk(self):
         fake_exec = executor.FakeExecutor()
+        fake_exec.sudo_script_results = [('out', 'err', 0)]
         install_script_provider = script_provider.FakeInstallScriptProvider(
             None, None)
         install_script_provider.fake_setup_script = 'script'
         ctrl = controller.ShellController(
             'vm', fake_exec, None, install_script_provider)
 
-        ctrl.install_to_disk(dict(vm_name='vm1'))
+        result = ctrl.install_to_disk(dict(vm_name='vm1'))
 
         self.assertEquals([
             (fake_exec.sudo_script, 'script:vm_name=vm1')
             ], fake_exec.fake_calls)
+
+        self.assertEquals('out', result.stdout)
+        self.assertEquals('err', result.stderr)
+        self.assertEquals(0, result.return_code)
 
     def test_mount_guest_disk_success(self):
         fake_exec = executor.FakeExecutor()

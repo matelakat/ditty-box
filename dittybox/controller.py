@@ -72,8 +72,8 @@ class ShellController(Controller):
         self.executor.sudo('echo "- - -" > /sys/class/scsi_host/host2/scan')
 
     def install_to_disk(self, params):
-        return self.executor.sudo_script(
-            self.install_script_provider.generate_install_script(params))
+        return ScriptResult(*self.executor.sudo_script(
+            self.install_script_provider.generate_install_script(params)))
 
     @property
     def vm_name(self):

@@ -29,6 +29,7 @@ class FakeExecutor(Executor):
     def __init__(self):
         self.fake_calls = []
         self.fake_sudo_failures = []
+        self.sudo_script_results = []
 
     def sudo(self, command):
         call = (self.sudo, command)
@@ -40,6 +41,7 @@ class FakeExecutor(Executor):
 
     def sudo_script(self, script):
         self.fake_calls.append((self.sudo_script, script))
+        return self.sudo_script_results.pop()
 
     def disconnect(self):
         raise NotImplementedError()
@@ -102,7 +104,7 @@ class SSHExecutor(Executor):
             fabric_api.sudo(
                 'rm -f %s %s %s' % (stdout, stderr, remote_script))
 
-            return ScriptResult(
+            return (
                 stdout_file.getvalue(),
                 stderr_file.getvalue(),
                 result.return_code,
