@@ -9,6 +9,7 @@ from dittybox import datacenter
 from dittybox import cmd_interface
 from dittybox import data_provider
 from dittybox import vm_param_generator
+from dittybox import executor
 
 
 class ConfigException(Exception):
@@ -28,10 +29,10 @@ def create_cmd_interface(config_file_path, filesystem):
 
         hv = hypervisor.get_server(cfg.hypervisor.ip, cfg.hypervisor.password)
 
-        executor = controller.SSHExecutor(cfg.controller)
+        xecutor = executor.SSHExecutor(cfg.controller)
         ctr = controller.ShellController(
             cfg.controller.vm_name,
-            executor,
+            xecutor,
             script_provider.PlainFileProvider(
                 filesystem,
                 cfg.user_script_provider.script_path),
