@@ -5,6 +5,7 @@ from dittybox.test import FakeStream
 from dittybox import controller
 from dittybox import script_provider
 from dittybox import data_provider
+from dittybox import executor
 
 
 class TestShellController(unittest.TestCase):
@@ -16,7 +17,7 @@ class TestShellController(unittest.TestCase):
         self.assertEquals('vmname', ctrl.vm_name)
 
     def test_unplug_disk(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         ctrl = controller.ShellController('vm', fake_exec, None, None)
 
         ctrl.unplug_disk()
@@ -26,7 +27,7 @@ class TestShellController(unittest.TestCase):
             fake_exec.fake_calls)
 
     def test_plug_disk(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         ctrl = controller.ShellController('vm', fake_exec, None, None)
 
         ctrl.plug_disk()
@@ -36,7 +37,7 @@ class TestShellController(unittest.TestCase):
             ], fake_exec.fake_calls)
 
     def test_debootstrap_to_disk(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         install_script_provider = script_provider.FakeInstallScriptProvider(
             None, None)
         install_script_provider.fake_setup_script = 'script'
@@ -50,7 +51,7 @@ class TestShellController(unittest.TestCase):
             ], fake_exec.fake_calls)
 
     def test_mount_guest_disk_success(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
 
         ctrl = controller.ShellController('vm', fake_exec, None, None)
         ctrl.mount_guest_disk()
@@ -62,7 +63,7 @@ class TestShellController(unittest.TestCase):
             fake_exec.fake_calls)
 
     def test_umount_guest_disk_success(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
 
         ctrl = controller.ShellController('vm', fake_exec, None, None)
         ctrl.umount_guest_disk()
@@ -73,7 +74,7 @@ class TestShellController(unittest.TestCase):
             fake_exec.fake_calls)
 
     def test_umount_guest_disk_retries(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         fake_exec.fake_sudo_failures = [(fake_exec.sudo, 'umount /dev/sdb1')] * 2
 
         ctrl = controller.ShellController('vm', fake_exec, None, None)
@@ -89,7 +90,7 @@ class TestShellController(unittest.TestCase):
             fake_exec.fake_calls)
 
     def test_inject_onetime_script(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         setup_script_provider = script_provider.FakeSetupScriptProvider()
         setup_script_provider.fake_upstart_script = 'upstart_script'
         setup_script_provider.fake_onetime_script = 'somescript'
@@ -104,7 +105,7 @@ class TestShellController(unittest.TestCase):
             fake_exec.fake_calls)
 
     def test_upload_data_first_time(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         fake_exec.fake_sudo_failures = [
             (fake_exec.sudo, 'test -f /datacenter_data/md5sum')]
         dp = data_provider.FakeDataProvider()
@@ -126,7 +127,7 @@ class TestShellController(unittest.TestCase):
         self.assertTrue(dp.fake_stream.closed)
 
     def test_upload_data_found_in_cache(self):
-        fake_exec = controller.FakeExecutor()
+        fake_exec = executor.FakeExecutor()
         dp = data_provider.FakeDataProvider()
         dp.fake_md5sum = 'md5sum'
 
