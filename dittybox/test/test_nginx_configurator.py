@@ -14,8 +14,8 @@ class ConfigMixIn(object):
             nginx_configurator.fake_config_generator)
 
 
-class TestSetMountPoint(unittest.TestCase, ConfigMixIn):
-    def test_setting_a_mountpoint(self):
+class TestAddMount(unittest.TestCase, ConfigMixIn):
+    def test_success(self):
         config = self.get_config(
             config_root='/opt/config', nginx_config_bits='/opt/nginx')
 
@@ -27,6 +27,17 @@ class TestSetMountPoint(unittest.TestCase, ConfigMixIn):
         ], config.filesystem_manipulator.executed_commands)
 
         self.assertTrue(result.succeeded)
+
+    def test_degenerate_mount(self):
+        config = self.get_config(
+            config_root='/opt/config', nginx_config_bits='/opt/nginx')
+
+        mount = nginx_configurator.Mount(None, 'ignore')
+
+        result = config.add_mount(mount)
+
+        self.assertFalse(result.succeeded)
+        self.assertEquals('degenerate mount', result.message)
 
     def test_location_already_mounted(self):
         config = self.get_config(

@@ -43,6 +43,8 @@ class NginXConfigurator(object):
         self.config_generator = config_generator
 
     def add_mount(self, mount):
+        if mount.is_degenerate:
+            return Failure('degenerate mount')
         resource_path = '/'.join([self.config_root, mount.resource])
         location_path = '/'.join([self.nginx_config_bits, mount.location])
         try:
