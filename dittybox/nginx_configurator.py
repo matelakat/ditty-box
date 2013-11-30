@@ -1,4 +1,5 @@
 import collections
+from dittybox import path
 
 
 class Result(object):
@@ -33,39 +34,14 @@ class Mount(collections.namedtuple("Mount", ["resource", "location"])):
         return None in [self.resource, self.location]
 
 
-class PathElement(object):
-    def __init__(self, path_element):
-        self._path_element = path_element
-
-    @property
-    def path_element(self):
-        return self._path_element
-
-
-class AbsPath(object):
-    def __init__(self, path):
-        self._path = path
-
-    @property
-    def path(self):
-        return self._path
-
-    def elements(self):
-        return '/'.split(self._path)
-
-    def __add__(self, other):
-        if hasattr(other, 'path_element'):
-            return AbsPath(self.path + '/' + other.path_element)
-
-
 class NginXConfigurator(object):
     MSG_DEGENERATE_MOUNT = 'degenerate mount'
 
     def __init__(self, filesystem, filesystem_manipulator, config_root,
                  nginx_config_bits, config_generator):
-        self.config_root = AbsPath(config_root)
+        self.config_root = path.AbsPath(config_root)
         self.filesystem = filesystem
-        self.nginx_config_bits = AbsPath(nginx_config_bits)
+        self.nginx_config_bits = path.AbsPath(nginx_config_bits)
         self.filesystem_manipulator = filesystem_manipulator
         self.config_generator = config_generator
 
@@ -78,8 +54,8 @@ class NginXConfigurator(object):
             if mount.location == existing_mount.location:
                 return Failure('%s already mounted' % mount.location)
 
-        resource_path = (self.config_root + PathElement(mount.resource)).path
-        location_path = (self.nginx_config_bits + PathElement(mount.location)).path
+        resource_path = (self.config_root + path.PathElement(mount.resource)).path
+        location_path = (self.nginx_config_bits + path.PathElement(mount.location)).path
         try:
             self.filesystem_manipulator.write(
                 resource_path,
@@ -99,7 +75,7 @@ class NginXConfigurator(object):
 
         for resource in resources:
             location = self.filesystem.contents_of(
-                (self.config_root + PathElement(resource)).path)
+                (self.config_root + path.PathElement(resource)).path)
             if location in locations:
                 result.append(Mount(resource, location))
                 locations_done.append(location)
@@ -120,8 +96,8 @@ class NginXConfigurator(object):
         if mount not in self.list_mounts().mounts:
             return Failure('non existing mount')
 
-        resource_path = (self.config_root + PathElement(mount.resource)).path
-        config_path = (self.nginx_config_bits + PathElement(mount.location)).path
+        resource_path = (self.config_root + path.PathElement(mount.resource)).path
+        config_path = (self.nginx_config_bits + path.PathElement(mount.location)).path
 
         self.filesystem_manipulator.rm(config_path)
         self.filesystem_manipulator.rm(resource_path)

@@ -5,7 +5,8 @@ from dittybox import filesystem_manipulator
 
 
 class ConfigMixIn(object):
-    def get_config(self, fs_contents={}, config_root='', nginx_config_bits=''):
+    def get_config(self, fs_contents={}, config_root='/config_root',
+                   nginx_config_bits='/config_bits'):
         fs = filesystem.FakeFilesystem()
         fs.content_by_path = fs_contents
 
