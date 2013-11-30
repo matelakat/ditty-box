@@ -34,6 +34,8 @@ class Mount(collections.namedtuple("Mount", ["resource", "location"])):
 
 
 class NginXConfigurator(object):
+    MSG_DEGENERATE_MOUNT = 'degenerate mount'
+
     def __init__(self, filesystem, filesystem_manipulator, config_root,
                  nginx_config_bits, config_generator):
         self.config_root = config_root
@@ -44,7 +46,7 @@ class NginXConfigurator(object):
 
     def add_mount(self, mount):
         if mount.is_degenerate:
-            return Failure('degenerate mount')
+            return Failure(self.MSG_DEGENERATE_MOUNT)
         resource_path = '/'.join([self.config_root, mount.resource])
         location_path = '/'.join([self.nginx_config_bits, mount.location])
         try:
@@ -87,7 +89,7 @@ class NginXConfigurator(object):
 
     def delete_mount(self, mount):
         if mount.is_degenerate:
-            return Failure('degenerate mount')
+            return Failure(self.MSG_DEGENERATE_MOUNT)
 
         if mount not in self.list_mounts().mounts:
             return Failure('non existing mount')
