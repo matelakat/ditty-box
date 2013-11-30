@@ -13,6 +13,10 @@ class Filesystem(object):
     def stream_of(self, path):
         pass
 
+    @abc.abstractmethod
+    def ls(self, path):
+        pass
+
 
 class FileWrapper(object):
     def __init__(self, filesystem, wrapped):
@@ -39,6 +43,17 @@ class FakeFilesystem(Filesystem):
         self.open_files += 1
         return FileWrapper(self, stream)
 
+    def ls(self, root_path):
+        root_path_elements = root_path.split('/')
+        results = []
+        for path in self.content_by_path:
+            path_elements = path.split('/')
+
+            if path_elements[0:len(root_path_elements)] == root_path_elements:
+                results.append(path_elements[len(root_path_elements)])
+
+        return results
+
 
 class LocalFilesystem(Filesystem):
     def contents_of(self, path):
@@ -47,3 +62,6 @@ class LocalFilesystem(Filesystem):
 
     def stream_of(self, path):
         return open(path, 'rb')
+
+    def ls(self, path):
+        raise NotImplementedError()
