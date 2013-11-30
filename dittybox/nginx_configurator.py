@@ -47,13 +47,14 @@ class NginXConfigurator(object):
     def add_mount(self, mount):
         if mount.is_degenerate:
             return Failure(self.MSG_DEGENERATE_MOUNT)
+
+        existing_mounts = self.list_mounts().mounts
+        for existing_mount in existing_mounts:
+            if mount.location == existing_mount.location:
+                return Failure('%s already mounted' % mount.location)
+
         resource_path = '/'.join([self.config_root, mount.resource])
         location_path = '/'.join([self.nginx_config_bits, mount.location])
-        try:
-            contents = self.filesystem.contents_of(location_path)
-            return Failure('%s already mounted' % mount.location)
-        except:
-            pass
         try:
             self.filesystem_manipulator.write(
                 resource_path,
