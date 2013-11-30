@@ -27,10 +27,10 @@ class SuccessListing(Success):
         self.mounts = mounts
 
 
-class Mount(collections.namedtuple("Mount", ["identifier", "location"])):
+class Mount(collections.namedtuple("Mount", ["resource", "location"])):
     @property
     def is_degenerate(self):
-        return None in [self.identifier, self.location]
+        return None in [self.resource, self.location]
 
 
 class NginXConfigurator(object):
@@ -43,7 +43,7 @@ class NginXConfigurator(object):
         self.config_generator = config_generator
 
     def add_mount(self, mount):
-        resource_path = '/'.join([self.config_root, mount.identifier])
+        resource_path = '/'.join([self.config_root, mount.resource])
         location_path = '/'.join([self.nginx_config_bits, mount.location])
         try:
             contents = self.filesystem.contents_of(location_path)
@@ -90,7 +90,7 @@ class NginXConfigurator(object):
         if mount not in self.list_mounts().mounts:
             return Failure('non existing mount')
 
-        resource_path = '/'.join([self.config_root, mount.identifier])
+        resource_path = '/'.join([self.config_root, mount.resource])
         config_path = '/'.join([self.nginx_config_bits, mount.location])
 
         self.filesystem_manipulator.rm(config_path)
