@@ -46,7 +46,7 @@ class NginXConfigurator(object):
                 self.config_generator(mount.location))
         except Exception as e:
             return results.Failure(e.message)
-        return results.Success()
+        return results.success()
 
     def list_mounts(self):
         result = []
@@ -82,7 +82,7 @@ class NginXConfigurator(object):
 
         self.filesystem_manipulator.rm(config_path)
         self.filesystem_manipulator.rm(resource_path)
-        return results.Success()
+        return results.success()
 
 
 def fake_config_generator(location):

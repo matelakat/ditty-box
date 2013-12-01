@@ -32,7 +32,7 @@ class FilesystemManipulator(object):
             return results.Failure(
                 'standard output: %s, standard error: %s, return code: %s' %
                     execution_result)
-        return results.Success()
+        return results.success()
 
     def mkdir(self, path):
         return self._convert_return_code(

@@ -4,7 +4,7 @@ SuccessTuple = collections.namedtuple('SuccessTuple', ['succeeded'])
 FailureTuple = collections.namedtuple('FailureTuple', ['succeeded', 'message'])
 
 
-def Success():
+def success():
     return SuccessTuple(True)
 
 
