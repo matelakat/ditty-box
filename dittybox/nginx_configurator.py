@@ -28,12 +28,12 @@ class NginXConfigurator(object):
 
     def add_mount(self, mount):
         if mount.is_degenerate:
-            return results.Failure(self.MSG_DEGENERATE_MOUNT)
+            return results.failure(self.MSG_DEGENERATE_MOUNT)
 
         existing_mounts = self.list_mounts().mounts
         for existing_mount in existing_mounts:
             if mount.location == existing_mount.location:
-                return results.Failure('%s already mounted' % mount.location)
+                return results.failure('%s already mounted' % mount.location)
 
         resource_path = (self.config_root + path.PathElement(mount.resource)).path
         location_path = (self.nginx_config_bits + path.PathElement(mount.location)).path
@@ -45,7 +45,7 @@ class NginXConfigurator(object):
                 location_path,
                 self.config_generator(mount.location))
         except Exception as e:
-            return results.Failure(e.message)
+            return results.failure(e.message)
         return results.success()
 
     def list_mounts(self):
@@ -72,10 +72,10 @@ class NginXConfigurator(object):
 
     def delete_mount(self, mount):
         if mount.is_degenerate:
-            return results.Failure(self.MSG_DEGENERATE_MOUNT)
+            return results.failure(self.MSG_DEGENERATE_MOUNT)
 
         if mount not in self.list_mounts().mounts:
-            return results.Failure('non existing mount')
+            return results.failure('non existing mount')
 
         resource_path = (self.config_root + path.PathElement(mount.resource)).path
         config_path = (self.nginx_config_bits + path.PathElement(mount.location)).path

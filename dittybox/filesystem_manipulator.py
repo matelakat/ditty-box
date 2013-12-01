@@ -29,7 +29,7 @@ class FilesystemManipulator(object):
 
     def _convert_return_code(self, execution_result):
         if execution_result.return_code != 0:
-            return results.Failure(
+            return results.failure(
                 'standard output: %s, standard error: %s, return code: %s' %
                     execution_result)
         return results.success()
