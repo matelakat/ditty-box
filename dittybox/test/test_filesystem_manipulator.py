@@ -50,7 +50,23 @@ class TestRm(unittest.TestCase):
         exc = executor.FakeExecutor()
         manipulator = filesystem_manipulator.FilesystemManipulator(exc)
 
-        manipulator.rm('some_path')
+        result = manipulator.rm('some_path')
 
         self.assertEquals([
             (exc.sudo, 'rm -rf some_path')], exc.fake_calls)
+
+        self.assertTrue(result.succeeded)
+
+    def test_failure(self):
+        exc = executor.FakeExecutor()
+        exc.fake_results = {
+            'sudo rm -rf some_path': executor.RunResult('stdout', 'stderr', 1)}
+        manipulator = filesystem_manipulator.FilesystemManipulator(exc)
+
+        result = manipulator.rm('some_path')
+
+        self.assertFalse(result.succeeded)
+
+        self.assertEquals(
+            'standard output: stdout, standard error: stderr, return code: 1',
+            result.message)

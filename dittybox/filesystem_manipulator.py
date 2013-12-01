@@ -27,16 +27,20 @@ class FilesystemManipulator(object):
     def __init__(self, executor):
         self.executor = executor
 
-    def mkdir(self, path):
-        result = self.executor.sudo('mkdir -p %s' % path)
-        if result.return_code != 0:
+    def _convert_return_code(self, execution_result):
+        if execution_result.return_code != 0:
             return results.Failure(
                 'standard output: %s, standard error: %s, return code: %s' %
-                    result)
+                    execution_result)
         return results.Success()
+
+    def mkdir(self, path):
+        return self._convert_return_code(
+            self.executor.sudo('mkdir -p %s' % path))
 
     def write(self, path, contents):
         self.executor.put(StringIO.StringIO(contents), path)
 
     def rm(self, path):
-        self.executor.sudo('rm -rf %s' % path)
+        return self._convert_return_code(
+            self.executor.sudo('rm -rf %s' % path))
