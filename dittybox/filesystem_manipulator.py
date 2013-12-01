@@ -21,7 +21,7 @@ class Fake(object):
         self._add_command('rm %s' % path)
 
 
-class RemoteFileSystemManipulator(object):
+class FilesystemManipulator(object):
     def __init__(self, executor):
         self.executor = executor
 

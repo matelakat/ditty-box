@@ -7,7 +7,7 @@ from dittybox import executor
 class TestMkdir(unittest.TestCase):
     def test_success(self):
         exc = executor.FakeExecutor()
-        manipulator = filesystem_manipulator.RemoteFileSystemManipulator(exc)
+        manipulator = filesystem_manipulator.FilesystemManipulator(exc)
 
         manipulator.mkdir('some_path')
 
@@ -17,7 +17,7 @@ class TestMkdir(unittest.TestCase):
 class TestWrite(unittest.TestCase):
     def test_success(self):
         exc = executor.FakeExecutor()
-        manipulator = filesystem_manipulator.RemoteFileSystemManipulator(exc)
+        manipulator = filesystem_manipulator.FilesystemManipulator(exc)
 
         manipulator.write('some_path', 'some_content')
 
@@ -32,7 +32,7 @@ class TestWrite(unittest.TestCase):
 class TestRm(unittest.TestCase):
     def test_success(self):
         exc = executor.FakeExecutor()
-        manipulator = filesystem_manipulator.RemoteFileSystemManipulator(exc)
+        manipulator = filesystem_manipulator.FilesystemManipulator(exc)
 
         manipulator.rm('some_path')
 
