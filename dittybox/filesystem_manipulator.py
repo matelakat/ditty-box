@@ -1,6 +1,10 @@
 import StringIO
 
 
+class Error(Exception):
+    pass
+
+
 class Fake(object):
     def __init__(self):
         self.executed_commands = []
@@ -26,7 +30,9 @@ class FilesystemManipulator(object):
         self.executor = executor
 
     def mkdir(self, path):
-        self.executor.sudo('mkdir -p %s' % path)
+        result = self.executor.sudo('mkdir -p %s' % path)
+        if result.return_code != 0:
+            raise Error()
 
     def write(self, path, contents):
         self.executor.put(StringIO.StringIO(contents), path)
