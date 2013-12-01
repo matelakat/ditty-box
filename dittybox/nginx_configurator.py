@@ -5,7 +5,7 @@ from dittybox import results
 
 SuccessListingTuple = collections.namedtuple('SuccessListingTuple', ['succeeded', 'mounts'])
 
-def SuccessListing(mounts):
+def success_listing(mounts):
     return SuccessListingTuple(True, mounts)
 
 
@@ -68,7 +68,7 @@ class NginXConfigurator(object):
                 continue
             result.append(Mount(None, location))
 
-        return SuccessListing(result)
+        return success_listing(result)
 
     def delete_mount(self, mount):
         if mount.is_degenerate:
