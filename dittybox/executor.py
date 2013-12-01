@@ -1,11 +1,18 @@
 import abc
+import collections
+
+
+RunResult = collections.namedtuple('RunResult', ['stdout', 'sterr', 'return_code'])
 
 
 class Executor(object):
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
     def sudo(self, command):
+        return RunResult(*self._sudo(command))
+
+    @abc.abstractmethod
+    def _sudo(self, command):
         pass
 
     @abc.abstractmethod
@@ -24,20 +31,27 @@ class Executor(object):
     def wait(self):
         pass
 
+    @abc.abstractmethod
+    def get(self):
+        pass
+
 
 class FakeExecutor(Executor):
     def __init__(self):
         self.fake_calls = []
         self.fake_sudo_failures = []
         self.sudo_script_results = []
+        self.fake_results = {}
 
-    def sudo(self, command):
+    def _sudo(self, command):
         call = (self.sudo, command)
         self.fake_calls.append(call)
+        if 'sudo %s' % command in self.fake_results:
+            return self.fake_results['sudo %s' % command]
         if call in self.fake_sudo_failures:
             self.fake_sudo_failures.remove(call)
-            return False
-        return True
+            return None, None, 1
+        return None, None, 0
 
     def sudo_script(self, script):
         self.fake_calls.append((self.sudo_script, script))
@@ -51,6 +65,9 @@ class FakeExecutor(Executor):
 
     def wait(self):
         self.fake_calls.append((self.wait,))
+
+    def get(self, path):
+        return self.fake_results['get %s' % path]
 
 
 class SSHExecutor(Executor):
@@ -71,10 +88,10 @@ class SSHExecutor(Executor):
             warn_only=True,
         )
 
-    def sudo(self, command):
+    def _sudo(self, command):
         with self._settings():
             result = fabric_api.sudo(command)
-            return result.succeeded
+            return result, None, result.return_code
 
     def sudo_script(self, script):
         script_file = StringIO.StringIO(script)
@@ -123,4 +140,5 @@ class SSHExecutor(Executor):
     def wait(self):
         time.sleep(0.5)
 
-
+    def get(self, path):
+        raise NotImplementedError()

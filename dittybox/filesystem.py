@@ -65,3 +65,18 @@ class LocalFilesystem(Filesystem):
 
     def ls(self, path):
         raise NotImplementedError()
+
+
+class RemoteFilesystem(Filesystem):
+    def __init__(self, executor):
+        self.executor = executor
+
+    def contents_of(self, path):
+        return self.executor.get(path)
+
+    def stream_of(self, path):
+        return StringIO.StringIO(self.contents_of(path))
+
+    def ls(self, path):
+        ls_results = self.executor.sudo('ls -1 %s' % path)
+        return ls_results.stdout.split('\n')

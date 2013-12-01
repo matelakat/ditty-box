@@ -91,7 +91,7 @@ class ShellController(Controller):
         self.executor.sudo("mount /dev/sdb1 /mnt/ubuntu")
 
     def umount_guest_disk(self):
-        while not self.executor.sudo("umount /dev/sdb1"):
+        while self.executor.sudo("umount /dev/sdb1").return_code != 0:
             self.executor.wait()
 
     def inject_onetime_script(self):
@@ -106,7 +106,7 @@ class ShellController(Controller):
         self.executor.sudo('mkdir -p /datacenter_data')
         fname = data_provider.get_md5()
         fpath = "/datacenter_data/%s" % fname
-        if not self.executor.sudo('test -f %s' % fpath):
+        if self.executor.sudo('test -f %s' % fpath).return_code != 0:
             with contextlib.closing(data_provider.get_stream()) as stream:
                 self.executor.put(stream, fpath)
         self.executor.sudo('cp %s /mnt/ubuntu/root/data.blob' % fpath)
