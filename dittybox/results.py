@@ -1,18 +1,12 @@
-class Result(object):
-    def __init__(self, succeeded, message=None):
-        self._succeeded = succeeded
-        self.message = message
+import collections
 
-    @property
-    def succeeded(self):
-        return self._succeeded
+SuccessTuple = collections.namedtuple('SuccessTuple', ['succeeded'])
+FailureTuple = collections.namedtuple('FailureTuple', ['succeeded', 'message'])
 
 
-class Success(Result):
-    def __init__(self):
-        super(Success, self).__init__(True)
+def Success():
+    return SuccessTuple(True)
 
 
-class Failure(Result):
-    def __init__(self, message):
-        super(Failure, self).__init__(False, message)
+def Failure(message):
+    return FailureTuple(False, message)

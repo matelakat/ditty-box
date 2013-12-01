@@ -3,10 +3,10 @@ from dittybox import path
 from dittybox import results
 
 
-class SuccessListing(results.Success):
-    def __init__(self, mounts):
-        super(SuccessListing, self).__init__()
-        self.mounts = mounts
+SuccessListingTuple = collections.namedtuple('SuccessListingTuple', ['succeeded', 'mounts'])
+
+def SuccessListing(mounts):
+    return SuccessListingTuple(True, mounts)
 
 
 class Mount(collections.namedtuple("Mount", ["resource", "location"])):
