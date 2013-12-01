@@ -9,10 +9,12 @@ class TestMkdir(unittest.TestCase):
         exc = executor.FakeExecutor()
         manipulator = filesystem_manipulator.FilesystemManipulator(exc)
 
-        manipulator.mkdir('some_path')
+        result = manipulator.mkdir('some_path')
 
         self.assertEquals([
             (exc.sudo, 'mkdir -p some_path')], exc.fake_calls)
+
+        self.assertTrue(result.succeeded)
 
     def test_execution_fails(self):
         exc = executor.FakeExecutor()

@@ -33,6 +33,7 @@ class FilesystemManipulator(object):
             return results.Failure(
                 'standard output: %s, standard error: %s, return code: %s' %
                     result)
+        return results.Success()
 
     def write(self, path, contents):
         self.executor.put(StringIO.StringIO(contents), path)
