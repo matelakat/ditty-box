@@ -16,3 +16,11 @@ class Fake(object):
 
     def rm(self, path):
         self._add_command('rm %s' % path)
+
+
+class RemoteFileSystemManipulator(object):
+    def __init__(self, executor):
+        self.executor = executor
+
+    def mkdir(self, path):
+        self.executor.sudo('mkdir -p %s' % path)
