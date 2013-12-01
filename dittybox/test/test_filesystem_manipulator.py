@@ -13,3 +13,17 @@ class TestMkdir(unittest.TestCase):
 
         self.assertEquals([
             (exc.sudo, 'mkdir -p some_path')], exc.fake_calls)
+
+class TestWrite(unittest.TestCase):
+    def test_success(self):
+        exc = executor.FakeExecutor()
+        manipulator = filesystem_manipulator.RemoteFileSystemManipulator(exc)
+
+        manipulator.write('some_path', 'some_content')
+
+        call, = exc.fake_calls
+        cmd, filelike, path = call
+
+        self.assertEquals(exc.put, cmd)
+        self.assertEquals('some_content', filelike.read())
+        self.assertEquals('some_path', path)

@@ -1,3 +1,6 @@
+import StringIO
+
+
 class Fake(object):
     def __init__(self):
         self.executed_commands = []
@@ -24,3 +27,6 @@ class RemoteFileSystemManipulator(object):
 
     def mkdir(self, path):
         self.executor.sudo('mkdir -p %s' % path)
+
+    def write(self, path, contents):
+        self.executor.put(StringIO.StringIO(contents), path)
