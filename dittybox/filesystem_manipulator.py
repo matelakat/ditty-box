@@ -30,3 +30,6 @@ class RemoteFileSystemManipulator(object):
 
     def write(self, path, contents):
         self.executor.put(StringIO.StringIO(contents), path)
+
+    def rm(self, path):
+        self.executor.sudo('rm -rf %s' % path)

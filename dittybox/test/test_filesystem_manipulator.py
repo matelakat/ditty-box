@@ -27,3 +27,14 @@ class TestWrite(unittest.TestCase):
         self.assertEquals(exc.put, cmd)
         self.assertEquals('some_content', filelike.read())
         self.assertEquals('some_path', path)
+
+
+class TestRm(unittest.TestCase):
+    def test_success(self):
+        exc = executor.FakeExecutor()
+        manipulator = filesystem_manipulator.RemoteFileSystemManipulator(exc)
+
+        manipulator.rm('some_path')
+
+        self.assertEquals([
+            (exc.sudo, 'rm -rf some_path')], exc.fake_calls)
