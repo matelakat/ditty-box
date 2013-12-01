@@ -17,11 +17,15 @@ class TestMkdir(unittest.TestCase):
     def test_execution_fails(self):
         exc = executor.FakeExecutor()
         exc.fake_results = {
-            'sudo mkdir -p some_path': executor.RunResult(None, None, 1)}
+            'sudo mkdir -p some_path': executor.RunResult('stdout', 'stderr', 1)}
         manipulator = filesystem_manipulator.FilesystemManipulator(exc)
 
-        with self.assertRaises(filesystem_manipulator.Error) as ctx:
-            manipulator.mkdir('some_path')
+        result = manipulator.mkdir('some_path')
+
+        self.assertFalse(result.succeeded)
+        self.assertEquals(
+            'standard output: stdout, standard error: stderr, return code: 1',
+            result.message)
 
 
 class TestWrite(unittest.TestCase):

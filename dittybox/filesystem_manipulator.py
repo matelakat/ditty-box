@@ -1,8 +1,6 @@
 import StringIO
 
-
-class Error(Exception):
-    pass
+from dittybox import results
 
 
 class Fake(object):
@@ -32,7 +30,9 @@ class FilesystemManipulator(object):
     def mkdir(self, path):
         result = self.executor.sudo('mkdir -p %s' % path)
         if result.return_code != 0:
-            raise Error()
+            return results.Failure(
+                'standard output: %s, standard error: %s, return code: %s' %
+                    result)
 
     def write(self, path, contents):
         self.executor.put(StringIO.StringIO(contents), path)

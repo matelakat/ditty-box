@@ -1,28 +1,9 @@
 import collections
 from dittybox import path
+from dittybox import results
 
 
-class Result(object):
-    def __init__(self, succeeded, message=None):
-        self._succeeded = succeeded
-        self.message = message
-
-    @property
-    def succeeded(self):
-        return self._succeeded
-
-
-class Success(Result):
-    def __init__(self):
-        super(Success, self).__init__(True)
-
-
-class Failure(Result):
-    def __init__(self, message):
-        super(Failure, self).__init__(False, message)
-
-
-class SuccessListing(Success):
+class SuccessListing(results.Success):
     def __init__(self, mounts):
         super(SuccessListing, self).__init__()
         self.mounts = mounts
@@ -47,12 +28,12 @@ class NginXConfigurator(object):
 
     def add_mount(self, mount):
         if mount.is_degenerate:
-            return Failure(self.MSG_DEGENERATE_MOUNT)
+            return results.Failure(self.MSG_DEGENERATE_MOUNT)
 
         existing_mounts = self.list_mounts().mounts
         for existing_mount in existing_mounts:
             if mount.location == existing_mount.location:
-                return Failure('%s already mounted' % mount.location)
+                return results.Failure('%s already mounted' % mount.location)
 
         resource_path = (self.config_root + path.PathElement(mount.resource)).path
         location_path = (self.nginx_config_bits + path.PathElement(mount.location)).path
@@ -64,8 +45,8 @@ class NginXConfigurator(object):
                 location_path,
                 self.config_generator(mount.location))
         except Exception as e:
-            return Failure(e.message)
-        return Success()
+            return results.Failure(e.message)
+        return results.Success()
 
     def list_mounts(self):
         result = []
@@ -91,17 +72,17 @@ class NginXConfigurator(object):
 
     def delete_mount(self, mount):
         if mount.is_degenerate:
-            return Failure(self.MSG_DEGENERATE_MOUNT)
+            return results.Failure(self.MSG_DEGENERATE_MOUNT)
 
         if mount not in self.list_mounts().mounts:
-            return Failure('non existing mount')
+            return results.Failure('non existing mount')
 
         resource_path = (self.config_root + path.PathElement(mount.resource)).path
         config_path = (self.nginx_config_bits + path.PathElement(mount.location)).path
 
         self.filesystem_manipulator.rm(config_path)
         self.filesystem_manipulator.rm(resource_path)
-        return Success()
+        return results.Success()
 
 
 def fake_config_generator(location):
