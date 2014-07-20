@@ -1,6 +1,14 @@
 #!/bin/bash
 
+# This requires you have netcat-openbsd installed
+# If DRY_RUN == YES, then no sync performed
+# If INTERACTIVE == YES then you can register ssh keys interactively
+
 set -eux
+
+DRY_RUN=${DRY_RUN:-NO}
+INTERACTIVE=${INTERACTIVE:-NO}
+
 
 function backup_host() {
     local ssh_config
@@ -23,10 +31,14 @@ function backup_host() {
         link_dest_param="--link-dest=$previous_backup_dir"
     fi
 
-    rsync -e "ssh -F $ssh_config" --rsync-path="sudo rsync" \
-      -v -r -H -l -g -o -t -D -p --del $link_dest_param \
-      --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/home/*/.gvfs} \
-      $hostip:/ "$target_dir"
+    if [ "YES" = "$DRY_RUN" ]; then
+        ssh -F $ssh_config $hostip "sudo rsync --version"
+    else
+        rsync -e "ssh -F $ssh_config" --rsync-path="sudo rsync" \
+          -v -r -H -l -g -o -t -D -p --del $link_dest_param \
+          --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/home/*/.gvfs} \
+          $hostip:/ "$target_dir"
+    fi
 }
 
 function tunnel_create() {
@@ -38,7 +50,7 @@ function tunnel_create() {
 }
 
 function tunnel_delete() {
-    tunnel_pid=$(/usr/sbin/lsof -i 4:9797 -Fp | tr -d "p")
+    tunnel_pid=$(lsof -i 4:9797 -Fp | tr -d "p")
     [ ! -z "$tunnel_pid" ]
     kill $tunnel_pid
 }
@@ -60,13 +72,24 @@ function generate_tunneling_ssh_config() {
     hosts="$6"
     ssh_config="$7"
 
+    local strict_host_key_checking
+    local batch_mode
+
+    if [ "YES" = "$INTERACTIVE" ]; then
+        strict_host_key_checking="ask"
+        batch_mode="no"
+    else
+        strict_host_key_checking="yes"
+        batch_mode="yes"
+    fi
+
 cat > "$ssh_config" << EOF
 UserKnownHostsFile $hosts_file
 
 # Set to yes for the daemon, ask for interactive
-StrictHostKeyChecking yes
+StrictHostKeyChecking $strict_host_key_checking
 # Set to yes for the daemon, no for interactive
-BatchMode yes
+BatchMode $batch_mode
 
 Host ssh-gateway
 Compression no
